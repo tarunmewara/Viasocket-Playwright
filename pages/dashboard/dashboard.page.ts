@@ -1,20 +1,188 @@
 import { Page, Locator } from '@playwright/test';
+import { AnalyticsComponent } from '../../components/dashboard/analytics.component';
+import { RenameCollectionModal } from '../../modals/rename-collection.modal';
 
 /**
  * Dashboard Page
- * Handles: org selection, create flow, flow cards, wallet, search, back
+ * Composes: AnalyticsComponent, RenameCollectionModal
+ * Page-unique: navbar actions, flow cards, collection sidebar, gallery
  */
 export class DashboardPage {
-    private readonly page: Page;
+    readonly page: Page;
+
+    // Composed components / modals
+    readonly analytics: AnalyticsComponent;
+    readonly renameCollectionModal: RenameCollectionModal;
+
+    // Navbar actions
+    readonly walletButton: Locator;
+    readonly searchButton: Locator;
+    readonly backButton: Locator;
+
+    // Headings
+    readonly metricsHeading: Locator;
+
+    // Flow / Automation list
+    readonly flowCard: Locator;
+    readonly recentWorkflowItem: Locator;
+
+    // Collection sidebar
+    readonly collectionAllButton: Locator;
+    readonly collectionCreateButton: Locator;
+    readonly collectionListItem: Locator;
+
+    // Create New Flow
+    readonly createNewFlowButton: Locator;
+
+    // Gallery
+    readonly galleryScrollLeftButton: Locator;
+    readonly galleryScrollRightButton: Locator;
+    readonly galleryCard: Locator;
 
     constructor(page: Page) {
         this.page = page;
+
+        // Compose from components/modals
+        this.analytics = new AnalyticsComponent(page);
+        this.renameCollectionModal = new RenameCollectionModal(page);
+
+        // data-testid locators from NewDashboardNavbar.tsx
+        this.walletButton = page.getByTestId('dashboard-wallet-button');
+        this.searchButton = page.getByTestId('dashboard-search-button');
+        this.backButton = page.getByTestId('dashboard-back-button');
+
+        // Flow cards & recent workflows
+        this.flowCard = page.getByTestId('flow-card');
+        this.recentWorkflowItem = page.getByTestId('recent-workflow-item');
+
+        // Collections
+        this.collectionAllButton = page.getByTestId('collection-all-button');
+        this.collectionCreateButton = page.getByTestId('collection-create-button');
+        this.collectionListItem = page.getByTestId('collection-list-item');
+
+        // Create New Flow
+        this.createNewFlowButton = page.getByRole('button', { name: 'Create New Flow' });
+
+        // Gallery
+        this.galleryScrollLeftButton = page.getByTestId('gallery-scroll-left-button');
+        this.galleryScrollRightButton = page.getByTestId('gallery-scroll-right-button');
+        this.galleryCard = page.getByTestId('gallery-card');
+
+        // Heading
+        this.metricsHeading = page.getByRole('heading', { name: 'Metrics' });
     }
 
-    // TODO: Add locators and methods
-    // Org grid cell, create new flow button
-    // dashboard-wallet-button, dashboard-search-button, dashboard-back-button
-    // org-datagrid, org-card-action, flow-card, recent-workflow-item
-    // collection-all-button, collection-create-button, collection-list-item
-    // collection-rename-input, collection-rename-submit-button, collection-rename-cancel-button
+    async clickWallet(): Promise<void> {
+        await this.walletButton.click();
+    }
+
+    async openSearchPanel(): Promise<void> {
+        await this.searchButton.click();
+    }
+
+    async goBack(): Promise<void> {
+        await this.backButton.click();
+    }
+
+    async clickFlowCard(index: number = 0): Promise<void> {
+        await this.flowCard.nth(index).click();
+    }
+
+    async clickRecentWorkflow(index: number = 0): Promise<void> {
+        await this.recentWorkflowItem.nth(index).click();
+    }
+
+    async createCollection(): Promise<void> {
+        await this.collectionCreateButton.click();
+    }
+
+    async selectCollection(index: number = 0): Promise<void> {
+        await this.collectionListItem.nth(index).click();
+    }
+
+    async renameCollection(newName: string): Promise<void> {
+        await this.renameCollectionModal.renameCollection(newName);
+    }
+
+    async cancelCollectionRename(): Promise<void> {
+        await this.renameCollectionModal.cancel();
+    }
+
+    // --- Create New Flow ---
+
+    async clickCreateNewFlow(): Promise<void> {
+        await this.createNewFlowButton.click();
+    }
+
+    // --- Filter tabs (delegated) ---
+
+    async selectFilter(
+        filter: 'all' | 'active' | 'draft' | 'failed' | 'paused' | 'trash'
+    ): Promise<void> {
+        await this.analytics.selectFilter(filter);
+    }
+
+    async selectAllWorkflows(): Promise<void> {
+        await this.analytics.selectFilter('all');
+    }
+
+    async selectLive(): Promise<void> {
+        await this.analytics.selectFilter('active');
+    }
+
+    async selectDrafted(): Promise<void> {
+        await this.analytics.selectFilter('draft');
+    }
+
+    async selectError(): Promise<void> {
+        await this.analytics.selectFilter('failed');
+    }
+
+    async selectPaused(): Promise<void> {
+        await this.analytics.selectFilter('paused');
+    }
+
+    async selectTrashed(): Promise<void> {
+        await this.analytics.selectFilter('trash');
+    }
+
+    // --- Analytics time period (delegated) ---
+
+    async selectTimePeriod(period: 'today' | 'last7days'): Promise<void> {
+        await this.analytics.selectTimePeriod(period);
+    }
+
+    async selectToday(): Promise<void> {
+        await this.analytics.selectToday();
+    }
+
+    async selectLast7Days(): Promise<void> {
+        await this.analytics.selectLast7Days();
+    }
+
+    // --- Analytics metrics (read-only) ---
+
+    async getRunsCount(): Promise<string | null> {
+        return this.page.getByText(/^Runs:/).textContent();
+    }
+
+    async getSuccessPercent(): Promise<string | null> {
+        return this.page.getByText(/^Success:/).textContent();
+    }
+
+    async getFailurePercent(): Promise<string | null> {
+        return this.page.getByText(/^Failure:/).textContent();
+    }
+
+    async getFlowCardCount(): Promise<number> {
+        return this.flowCard.count();
+    }
+
+    async scrollGalleryLeft(): Promise<void> {
+        await this.galleryScrollLeftButton.click();
+    }
+
+    async scrollGalleryRight(): Promise<void> {
+        await this.galleryScrollRightButton.click();
+    }
 }

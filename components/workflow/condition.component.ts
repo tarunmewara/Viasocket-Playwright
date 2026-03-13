@@ -2,15 +2,26 @@ import { Page, Locator } from '@playwright/test';
 
 /**
  * Condition Component
- * Handles: "Run Flow If" condition toggle, condition input, backdrop dismiss
+ * Handles: if-block condition slider — add condition button
+ * Reference: ifBlockSlider.tsx
  */
 export class ConditionComponent {
-    private readonly page: Page;
+    readonly page: Page;
+
+    readonly addConditionButton: Locator;
 
     constructor(page: Page) {
         this.page = page;
+
+        // data-testid locator from ifBlockSlider.tsx
+        this.addConditionButton = page.getByTestId('ifblock-add-condition-button');
     }
 
-    // TODO: Add locators and methods
-    // Run Flow If text, enable switch, condition textbox, backdrop
+    async addCondition(): Promise<void> {
+        await this.addConditionButton.click();
+    }
+
+    async isAddConditionVisible(): Promise<boolean> {
+        return this.addConditionButton.isVisible();
+    }
 }

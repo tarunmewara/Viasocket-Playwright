@@ -61,6 +61,8 @@ Viasocket-Playwright/
 │   │   ├── workspace-settings.component.ts   # Workspace name/timezone/industry/domain
 │   │   ├── billing.component.ts              # Billing plans, change plan
 │   │   └── offers.component.ts               # Promo cards, partner discounts
+│   ├── search/                        # Search panel components
+│   │   └── search-panel.component.ts  # Search panel (Ctrl+K, flow/log search, keyboard nav)
 │   ├── sidebar/                       # Global sidebar navigation
 │   │   └── sidepanel.component.ts     # Home, Search, Connections, MCP, Settings links
 │   ├── transfer/                      # Data transfer components
@@ -102,6 +104,8 @@ Viasocket-Playwright/
 │   │   └── interface-config.page.ts   # Embed display config (23 toggles/inputs)
 │   ├── mcp/
 │   │   └── mcp.page.ts               # MCP server client selection
+│   ├── metrics/
+│   │   └── metrics.page.ts           # Metrics tables/charts, timeframe, flow/step tabs
 │   ├── oauth/
 │   │   └── oauth.page.ts             # OAuth integrations, URI management
 │   ├── settings/

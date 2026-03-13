@@ -6,7 +6,7 @@ import path from 'path';
 config({ path: path.resolve(__dirname, '.env') });
 
 // Resolve the auth storage path (login bypass) from env, with fallback
-const storageState = process.env.STORAGE_STATE ?? 'playwright/.auth/user.json';
+const storageState = path.resolve(__dirname, process.env.STORAGE_STATE ?? 'playwright/.auth/user.json');
 
 export default defineConfig({
     testDir: './tests',

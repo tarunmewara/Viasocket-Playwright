@@ -12,6 +12,11 @@
     "include": [
         "tests/**/*.ts",
         "pages/**/*.ts",
+        "components/**/*.ts",
+        "modals/**/*.ts",
+        "fixtures/**/*.ts",
+        "utils/**/*.ts",
+        "auth/**/*.ts",
         "playwright.config.ts"
     ],
     "exclude": [
