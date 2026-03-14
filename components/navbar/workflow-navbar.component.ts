@@ -19,6 +19,14 @@ export class WorkflowNavbarComponent {
     // Resume / Restore button
     readonly resumeRestoreButton: Locator;
 
+    // Breadcrumb (FlowBreadcrumb.tsx)
+    readonly breadcrumbHomeLink: Locator;
+
+    // Flow Document icon button (workFlowNavbar.tsx — data-testid='flow-document-icon-button')
+    readonly flowDocumentButton: Locator;
+    // Flow Document popover close button (data-testid='flow-document-close-button')
+    readonly flowDocumentCloseButton: Locator;
+
     // More options (hamburger)
     readonly moreOptionsButton: Locator;
     readonly menuItem: Locator;
@@ -32,6 +40,12 @@ export class WorkflowNavbarComponent {
         this.logViewTab = page.getByTestId('workflow-log-view-tab');
         this.refreshChip = page.getByTestId('workflow-refresh-chip');
         this.resumeRestoreButton = page.getByTestId('workflow-resume-restore-button');
+
+        // data-testid from FlowBreadcrumb.tsx
+        this.breadcrumbHomeLink = page.getByTestId('breadcrumb-home-link');
+
+        this.flowDocumentButton = page.getByTestId('flow-document-icon-button');
+        this.flowDocumentCloseButton = page.getByTestId('flow-document-close-button');
 
         // data-testid locators from flowPageMoreOptions.tsx
         this.moreOptionsButton = page.getByTestId('flow-more-options-button');

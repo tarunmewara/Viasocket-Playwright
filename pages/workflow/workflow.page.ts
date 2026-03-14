@@ -49,6 +49,24 @@ export class WorkflowPage {
     readonly jsonEditorChatgptLink: Locator;
     readonly jsonEditorExampleJsonLink: Locator;
 
+    // Canvas elements (new flow / before trigger selected)
+    readonly selectTriggerPrompt: Locator;      // SelectTrigger.tsx — data-testid='select-trigger-prompt'
+    readonly goalStickyNote: Locator;           // FlowDescriptionStickyNote.tsx — data-testid='goal-sticky-note'
+
+    // ZoomableFlowComponent.tsx elements
+    readonly flowCanvasWrapper: Locator;        // data-testid='flow-canvas-wrapper'
+    readonly flowCanvas: Locator;               // data-testid='flow-canvas'
+    readonly flowZoomContainer: Locator;        // data-testid='flow-zoom-container'
+    readonly flowControlsContainer: Locator;   // data-testid='flow-controls-container'
+    readonly askAIButton: Locator;              // data-testid='ask-ai-button'
+    readonly zoomControls: Locator;             // data-testid='zoom-controls' (ButtonGroup)
+    readonly zoomFitButton: Locator;            // data-testid='zoom-fit-button'
+    readonly zoomInButton: Locator;             // data-testid='zoom-in-button'
+    readonly zoomOutButton: Locator;            // data-testid='zoom-out-button'
+
+    // Step header — data-testid='step-change-button' (stepNameComponentV2.tsx)
+    readonly stepChangeButton: Locator;
+
     constructor(page: Page) {
         this.page = page;
 
@@ -59,7 +77,7 @@ export class WorkflowPage {
         this.jscode = new JSCodeComponent(page);
 
         // Page-unique locators
-        this.flowTitleInput = page.getByTestId('flow-title-input');
+        this.flowTitleInput = page.locator('#flow-title-textfield');
         this.pauseActiveToggle = page.getByTestId('flow-pause-active-toggle');
 
         // Dry run / test
@@ -88,6 +106,24 @@ export class WorkflowPage {
         // JSON editor
         this.jsonEditorChatgptLink = page.getByTestId('json-editor-chatgpt-link');
         this.jsonEditorExampleJsonLink = page.getByTestId('json-editor-example-json-link');
+
+        // Canvas elements — data-testid locators
+        this.selectTriggerPrompt = page.getByTestId('select-trigger-prompt');
+        this.goalStickyNote = page.getByTestId('goal-sticky-note');
+
+        // ZoomableFlowComponent locators
+        this.flowCanvasWrapper = page.getByTestId('flow-canvas-wrapper');
+        this.flowCanvas = page.getByTestId('flow-canvas');
+        this.flowZoomContainer = page.getByTestId('flow-zoom-container');
+        this.flowControlsContainer = page.getByTestId('flow-controls-container');
+        this.askAIButton = page.getByTestId('ask-ai-button');
+        this.zoomControls = page.getByTestId('zoom-controls');
+        this.zoomFitButton = page.getByTestId('zoom-fit-button');
+        this.zoomInButton = page.getByTestId('zoom-in-button');
+        this.zoomOutButton = page.getByTestId('zoom-out-button');
+
+        // Step header
+        this.stepChangeButton = page.getByTestId('step-change-button');
     }
 
     // --- Publish ---
@@ -140,10 +176,20 @@ export class WorkflowPage {
         await this.jscode.clickDone();
     }
 
+    // --- Trigger / Step cards ---
+
+    async clickTriggerCard(): Promise<void> {
+        await this.eventActionCard.click();
+    }
+
+    async clickSingleStepConfigure(): Promise<void> {
+        await this.singleStepConfigureButton.click();
+    }
+
     // --- Flow title ---
 
     async setFlowTitle(title: string): Promise<void> {
-        await this.flowTitleInput.locator('input').fill(title);
+        await this.flowTitleInput.fill(title);
     }
 
     // --- Pause/Active ---
