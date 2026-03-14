@@ -19,10 +19,11 @@ export class CreateWorkspaceModal {
         this.page = page;
 
         // data-testid locators from createOrgModal.tsx
-        this.workspaceNameInput = page.getByTestId('create-org-workspace-name-input');
-        this.industryInput = page.getByTestId('create-org-industry-input');
-        this.employeesInput = page.getByTestId('create-org-employees-input');
-        this.domainInput = page.getByTestId('create-org-domain-input');
+        // MUI TextField puts data-testid on the wrapper <div>, so chain .locator('input') for fillable fields
+        this.workspaceNameInput = page.getByTestId('create-org-workspace-name-input').locator('input');
+        this.industryInput = page.getByTestId('create-org-industry-input').locator('input');
+        this.employeesInput = page.getByTestId('create-org-employees-input').locator('input');
+        this.domainInput = page.getByTestId('create-org-domain-input').locator('input');
         this.submitButton = page.getByTestId('create-org-submit-button');
         this.closeButton = page.getByTestId('create-org-close-button');
     }
