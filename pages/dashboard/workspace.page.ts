@@ -14,7 +14,8 @@ import { CreateWorkspaceModal } from '../../modals/create-workspace.modal';
 export class WorkspacePage {
     readonly page: Page;
 
-    // Workspace trigger (opens the dropdown menu)
+    // Workspace popover & trigger (selectedWorkspace.tsx)
+    readonly workspacePopover: Locator;
     readonly workspaceTrigger: Locator;
 
     // Workspace menu nav items (rendered via ListGroupedComponent, no individual data-testid)
@@ -56,6 +57,7 @@ export class WorkspacePage {
         this.page = page;
 
         // data-testid locators from selectedWorkspace.tsx
+        this.workspacePopover = page.getByTestId('workspace-popover');
         this.workspaceTrigger = page.getByTestId('workspace-trigger');
         this.betaSwitch = page.getByTestId('workspace-beta-switch');
         this.betaConfirmButton = page.getByTestId('workspace-beta-confirm');
@@ -73,8 +75,8 @@ export class WorkspacePage {
         this.renameInput = page.locator('.title-textfield input');
 
         // AllOrgs.tsx — DataGrid (>10 orgs) or card view (≤10 orgs)
-        this.orgDataGrid = page.locator('.MuiDataGrid-root');
-        this.orgCardAction = page.locator('.MuiCardActionArea-root');
+        this.orgDataGrid = page.getByRole('grid');
+        this.orgCardAction = page.getByRole('button').filter({ hasText: /Domain.*Timezone/ });
 
         // Create Workspace modal (composed)
         this.createModal = new CreateWorkspaceModal(page);
@@ -97,7 +99,7 @@ export class WorkspacePage {
     // --- Navigation ---
 
     async navigateToOrg(): Promise<void> {
-        await this.page.goto(`${process.env.BASE_URL || 'https://flow.viasocket.com'}/org`);
+        await this.page.goto('/org');
     }
 
     async goBack(): Promise<void> {
@@ -127,12 +129,10 @@ export class WorkspacePage {
     }
 
     async selectFirstWorkspace(): Promise<void> {
-        const isGrid = await this.orgDataGrid.isVisible().catch(() => false);
-        if (isGrid) {
-            await this.page.locator('.MuiDataGrid-row').first().click();
-        } else {
-            await this.orgCardAction.first().click();
-        }
+        // DataGrid row (skip header via gridcell filter) OR card-view button
+        const gridRow = this.page.getByRole('row').filter({ has: this.page.getByRole('gridcell') }).first();
+        const cardButton = this.orgCardAction.first();
+        await gridRow.or(cardButton).first().click();
     }
 
     async getWorkspaceCardCount(): Promise<number> {

@@ -9,6 +9,7 @@ config({ path: path.resolve(__dirname, '.env') });
 const storageState = path.resolve(__dirname, process.env.STORAGE_STATE ?? 'playwright/.auth/user.json');
 
 export default defineConfig({
+    globalSetup: './auth/global-setup.ts',
     testDir: './tests',
 
     /* Run tests in files in parallel */
@@ -40,7 +41,7 @@ export default defineConfig({
         // video: 'on',
         // trace: 'on',
 
-        baseURL: 'https://flow.viasocket.com',
+        baseURL: 'https://dev-flow.viasocket.com/',
 
         // Auth storage state loaded from .env (STORAGE_STATE=playwright/.auth/user.json)
         // This is used for login bypass — the user.json file contains saved browser session data

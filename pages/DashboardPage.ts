@@ -12,7 +12,7 @@ export class DashboardPage {
     }
 
     async navigateToOrg(): Promise<void> {
-        await this.page.goto('https://flow.viasocket.com/org');
+        await this.page.goto('/org');
     }
 
     async selectOrganization(): Promise<void> {

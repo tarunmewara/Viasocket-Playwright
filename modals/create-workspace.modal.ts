@@ -21,7 +21,7 @@ export class CreateWorkspaceModal {
         // Role/text/placeholder locators (data-testid stripped in prod build)
         this.workspaceNameInput = page.getByPlaceholder('Workspace name');
         this.industryInput = page.getByPlaceholder('Example :- IT');
-        this.employeesInput = page.getByRole('combobox').nth(1);
+        this.employeesInput = page.getByText('Number of Employees').locator('..').getByRole('combobox');
         this.domainInput = page.getByPlaceholder('Your official website address');
         this.submitButton = page.getByRole('button', { name: 'Create' });
         this.closeButton = page.getByRole('button', { name: 'Close' });
