@@ -22,6 +22,10 @@ export class DashboardPage {
     readonly navbarAccountButton: Locator;
     readonly navbarLogoutButton: Locator;
 
+    // Search panel (SearchPanel.tsx)
+    readonly searchPanelInput: Locator;
+    readonly searchPanelCloseButton: Locator;
+
     // Headings
     readonly metricsHeading: Locator;
 
@@ -78,6 +82,10 @@ export class DashboardPage {
         this.galleryScrollRightButton = page.getByTestId('gallery-scroll-right-button');
         this.galleryCard = page.getByTestId('gallery-card');
 
+        // Search panel (SearchPanel.tsx)
+        this.searchPanelInput = page.getByTestId('search-panel-input').locator('input');
+        this.searchPanelCloseButton = page.getByTestId('search-panel-close-button');
+
         // Heading
         this.metricsHeading = page.getByRole('heading', { name: 'Metrics' });
     }
@@ -88,6 +96,14 @@ export class DashboardPage {
 
     async openSearchPanel(): Promise<void> {
         await this.searchButton.click();
+    }
+
+    async searchFlows(query: string): Promise<void> {
+        await this.searchPanelInput.fill(query);
+    }
+
+    async closeSearchPanel(): Promise<void> {
+        await this.searchPanelCloseButton.click();
     }
 
     async goBack(): Promise<void> {
