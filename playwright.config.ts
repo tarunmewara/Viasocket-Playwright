@@ -41,7 +41,7 @@ export default defineConfig({
         // video: 'on',
         // trace: 'on',
 
-        baseURL: 'https://dev-flow.viasocket.com/',
+        baseURL: process.env.BASE_URL,
 
         // Auth storage state loaded from .env (STORAGE_STATE=playwright/.auth/user.json)
         // This is used for login bypass — the user.json file contains saved browser session data

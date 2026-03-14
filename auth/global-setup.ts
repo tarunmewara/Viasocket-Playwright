@@ -5,7 +5,11 @@ import { config as dotenvConfig } from 'dotenv';
 
 dotenvConfig({ path: path.resolve(__dirname, '../.env') });
 
-const STORAGE_PATH = path.resolve(__dirname, '../playwright/.auth/user.json');
+const STORAGE_PATH = path.resolve(
+    __dirname,
+    '..',
+    process.env.STORAGE_STATE!
+);
 
 /**
  * Global setup — handles login & session persistence
@@ -27,7 +31,7 @@ const STORAGE_PATH = path.resolve(__dirname, '../playwright/.auth/user.json');
  *   AUTH_COOKIE_NAME    – cookie name, defaults to "testing"
  */
 async function globalSetup(config: FullConfig) {
-    const baseURL = config.projects[0]?.use?.baseURL || 'https://dev-flow.viasocket.com/';
+    const baseURL = config.projects[0]?.use?.baseURL!;
 
     // Step 1: If user.json exists, validate it first
     if (fs.existsSync(STORAGE_PATH)) {
@@ -51,7 +55,7 @@ async function globalSetup(config: FullConfig) {
     }
 
     const cookieName = process.env.AUTH_COOKIE_NAME || 'testing';
-    const domain = '.viasocket.com';
+    const domain = process.env.COOKIE_DOMAIN || '.viasocket.com';
     const twoDays = Math.floor(Date.now() / 1000) + 2 * 24 * 60 * 60;
 
     // Load existing storageState so we preserve all other cookies (Cloudflare, analytics, etc.)
@@ -68,7 +72,7 @@ async function globalSetup(config: FullConfig) {
             name: cookieName,
             value: authToken,
             domain,
-            path: '/',
+            path: '/', 
             expires: twoDays,
             httpOnly: false,
             secure: true,
@@ -88,7 +92,7 @@ async function globalSetup(config: FullConfig) {
 
     // Verify the injected token works
     const page = await context.newPage();
-    await page.goto(`${baseURL}org`);
+    await page.goto(`${baseURL}/org`);
 
     const authHeading = page.getByRole('heading', { name: 'Select a Workspace' });
     const loginHeading = page.getByRole('heading', { name: 'Log in' });
@@ -122,7 +126,7 @@ async function validateStorageState(baseURL: string): Promise<boolean> {
     try {
         const context = await browser.newContext({ storageState: STORAGE_PATH });
         const page = await context.newPage();
-        await page.goto(`${baseURL}org`);
+        await page.goto(`${baseURL}/org`);
 
         const authenticated = page.getByRole('heading', { name: 'Select a Workspace' });
         const loginPage = page.getByRole('heading', { name: 'Log in' });
@@ -133,7 +137,7 @@ async function validateStorageState(baseURL: string): Promise<boolean> {
             loginPage.waitFor({ timeout: 15000 }).then(() => 'login' as const),
         ]).catch(() => 'timeout' as const);
 
-        return result === 'auth';
+        return result !== 'login';
     } catch {
         return false;
     } finally {

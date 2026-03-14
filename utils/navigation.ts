@@ -5,7 +5,7 @@ import { Page } from '@playwright/test';
  * Centralized navigation utilities for consistent URL handling
  */
 
-const BASE_URL = process.env.BASE_URL ?? 'https://flow.viasocket.com';
+const BASE_URL = process.env.BASE_URL!;
 
 export async function navigateToOrg(page: Page): Promise<void> {
     await page.goto(`${BASE_URL}/org`);

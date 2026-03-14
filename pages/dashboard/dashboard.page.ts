@@ -75,7 +75,7 @@ export class DashboardPage {
         this.createNewCollectionButton = page.getByTestId('create-new-collection-button');
 
         // Create New Flow
-        this.createNewFlowButton = page.getByRole('button', { name: 'Create New Flow' });
+        this.createNewFlowButton = page.getByTestId('project-slider-create-flow-btn');
 
         // Gallery
         this.galleryScrollLeftButton = page.getByTestId('gallery-scroll-left-button');
@@ -132,6 +132,12 @@ export class DashboardPage {
 
     async cancelCollectionRename(): Promise<void> {
         await this.renameCollectionModal.cancel();
+    }
+
+    // --- Navigation ---
+
+    async navigateToProject(projectId: string): Promise<void> {
+        await this.page.goto(`/projects/${projectId}`);
     }
 
     // --- Create New Flow ---
