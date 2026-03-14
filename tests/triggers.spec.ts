@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures/base.fixture';
 import { DashboardPage } from '../pages/DashboardPage';
 import { TriggersPage } from '../pages/TriggersPage';
 import { WorkflowPage } from '../pages/WorkflowPage';

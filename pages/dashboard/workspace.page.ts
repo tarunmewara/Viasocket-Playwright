@@ -1,11 +1,15 @@
 import { Page, Locator } from '@playwright/test';
+import { CreateWorkspaceModal } from '../../modals/create-workspace.modal';
 
 /**
  * Workspace Page
- * Handles: workspace menu (Switch Workspace, Workspace Settings, Members,
+ * Composes: CreateWorkspaceModal
+ * Handles: workspace selection page (search, create, datagrid/card list),
+ * workspace menu (Switch Workspace, Workspace Settings, Members,
  * Notifications, Edit Profile), leave workspace, beta toggle, logout,
- * profile menu, workspace selector
- * Reference: selectedWorkspace.tsx, WorkspacesComponent.tsx, LeaveWorkspaceButton.tsx
+ * profile menu
+ * Reference: selectedWorkspace.tsx, WorkspacesComponent.tsx, AllOrgs.tsx,
+ *            LeaveWorkspaceButton.tsx, createOrgModal.tsx
  */
 export class WorkspacePage {
     readonly page: Page;
@@ -31,6 +35,17 @@ export class WorkspacePage {
     readonly betaConfirmButton: Locator;
     readonly betaCancelButton: Locator;
 
+    // Workspace selection page (WorkspacesComponent.tsx / AllOrgs.tsx)
+    readonly backButton: Locator;
+    readonly searchInput: Locator;
+    readonly createNewWorkspaceButton: Locator;
+    readonly orgDataGrid: Locator;
+    readonly orgCardAction: Locator;
+    readonly renameInput: Locator;
+
+    // Create Workspace modal (composed)
+    readonly createModal: CreateWorkspaceModal;
+
     // Profile menu (on workspace selection page)
     readonly profileMenuButton: Locator;
     readonly profileMenu: Locator;
@@ -51,11 +66,24 @@ export class WorkspacePage {
         this.leaveWorkspaceConfirmButton = page.getByTestId('leave-workspace-confirm-button');
         this.leaveWorkspaceCancelButton = page.getByTestId('leave-workspace-cancel-button');
 
-        // data-testid locators from WorkspacesComponent.tsx (profile menu)
-        this.profileMenuButton = page.getByTestId('workspace-profile-menu-button');
-        this.profileMenu = page.getByTestId('profile-menu');
-        this.profileEditMenuItem = page.getByTestId('workspace-edit-profile-menu-item');
-        this.profileLogoutMenuItem = page.getByTestId('workspace-logout-menu-item');
+        // Role/text locators for workspace selection page (data-testid stripped in prod)
+        this.backButton = page.getByRole('button', { name: 'back' });
+        this.searchInput = page.getByPlaceholder('Search');
+        this.createNewWorkspaceButton = page.getByRole('button', { name: 'Create New Workspace' });
+        this.renameInput = page.locator('.title-textfield input');
+
+        // AllOrgs.tsx — DataGrid (>10 orgs) or card view (≤10 orgs)
+        this.orgDataGrid = page.locator('.MuiDataGrid-root');
+        this.orgCardAction = page.locator('.MuiCardActionArea-root');
+
+        // Create Workspace modal (composed)
+        this.createModal = new CreateWorkspaceModal(page);
+
+        // Profile menu (role/text locators — data-testid stripped in prod)
+        this.profileMenuButton = page.locator('.workspace__page button').filter({ has: page.locator('.MuiTypography-h6') }).first();
+        this.profileMenu = page.getByRole('menu');
+        this.profileEditMenuItem = page.getByRole('menuitem', { name: 'Edit Profile' });
+        this.profileLogoutMenuItem = page.getByRole('menuitem', { name: 'Logout' });
 
         // Role/text based locators (workSpaceLink items have no data-testid)
         this.switchWorkspaceLink = page.getByRole('button', { name: 'Switch Workspace' });
@@ -64,6 +92,55 @@ export class WorkspacePage {
         this.notificationsLink = page.getByRole('link', { name: 'Notifications' });
         this.editProfileLink = page.getByRole('link', { name: 'Edit Profile' });
         this.logoutLink = page.getByRole('button', { name: 'Log Out' });
+    }
+
+    // --- Navigation ---
+
+    async navigateToOrg(): Promise<void> {
+        await this.page.goto(`${process.env.BASE_URL || 'https://flow.viasocket.com'}/org`);
+    }
+
+    async goBack(): Promise<void> {
+        await this.backButton.click();
+    }
+
+    // --- Workspace selection page ---
+
+    async searchWorkspace(query: string): Promise<void> {
+        await this.searchInput.locator('input').fill(query);
+    }
+
+    async clickCreateNewWorkspace(): Promise<void> {
+        await this.createNewWorkspaceButton.click();
+    }
+
+    async selectWorkspaceByRow(orgId: string): Promise<void> {
+        await this.page.getByTestId(`org-row-${orgId}`).click();
+    }
+
+    async selectWorkspaceByCard(index: number = 0): Promise<void> {
+        await this.orgCardAction.nth(index).click();
+    }
+
+    async selectWorkspaceByName(name: string): Promise<void> {
+        await this.page.getByText(name, { exact: true }).first().click();
+    }
+
+    async selectFirstWorkspace(): Promise<void> {
+        const isGrid = await this.orgDataGrid.isVisible().catch(() => false);
+        if (isGrid) {
+            await this.page.locator('.MuiDataGrid-row').first().click();
+        } else {
+            await this.orgCardAction.first().click();
+        }
+    }
+
+    async getWorkspaceCardCount(): Promise<number> {
+        return this.orgCardAction.count();
+    }
+
+    async isDataGridVisible(): Promise<boolean> {
+        return this.orgDataGrid.isVisible();
     }
 
     // --- Workspace menu ---
@@ -155,5 +232,9 @@ export class WorkspacePage {
     async isBetaEnabled(): Promise<boolean> {
         const checkbox = this.betaSwitch.locator('input[type="checkbox"]');
         return checkbox.isChecked();
+    }
+
+    async isSelectWorkspacePageVisible(): Promise<boolean> {
+        return this.createNewWorkspaceButton.isVisible();
     }
 }
