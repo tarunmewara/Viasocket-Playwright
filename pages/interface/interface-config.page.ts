@@ -49,6 +49,11 @@ export class InterfaceConfigPage {
     // --- Preview Drawer ---
     readonly previewCloseButton: Locator;
 
+    // --- Interface filters ---
+    readonly interfaceFilterCategoryCheckbox: Locator;
+    readonly interfacePluginEventCheckbox: Locator;
+    readonly interfaceServiceBox: Locator;
+
     // --- Save ---
     readonly saveChangesButton: Locator;
 
@@ -92,6 +97,11 @@ export class InterfaceConfigPage {
 
         // Preview Drawer — from SetDisplayConfig.tsx
         this.previewCloseButton = page.getByTestId('config-preview-close-button');
+
+        // Interface filters — from SetDisplayConfig.tsx
+        this.interfaceFilterCategoryCheckbox = page.getByTestId('interface-filter-category-checkbox');
+        this.interfacePluginEventCheckbox = page.getByTestId('interface-plugin-event-checkbox');
+        this.interfaceServiceBox = page.getByTestId('interface-service-box');
 
         // Save — from EmbedConfigurationSaveChangesButton.tsx
         this.saveChangesButton = page.getByTestId('embed-save-changes-button');

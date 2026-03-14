@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Page, Locator } from '@playwright/test';
 import { CloseSliderComponent } from '../../components/common/close-slider.component';
 import { ConditionComponent } from '../../components/workflow/condition.component';
 
@@ -13,10 +13,18 @@ export class TriggersPage {
     readonly slider: CloseSliderComponent;
     readonly condition: ConditionComponent;
 
+    // Trigger selection
+    readonly triggerListItemButton: Locator;
+    readonly triggerTypeRadioGroup: Locator;
+
     constructor(page: Page) {
         this.page = page;
         this.slider = new CloseSliderComponent(page);
         this.condition = new ConditionComponent(page);
+
+        // data-testid locators from trigger components
+        this.triggerListItemButton = page.getByTestId('trigger-list-item-button');
+        this.triggerTypeRadioGroup = page.getByTestId('trigger-type-radio-group');
     }
 
     // --- Slider ---

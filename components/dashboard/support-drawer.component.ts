@@ -9,16 +9,22 @@ export class SupportDrawerComponent {
     readonly page: Page;
 
     readonly closeButton: Locator;
+    readonly dialogCloseButton: Locator;
     readonly contactItem: Locator;
     readonly liveChatItem: Locator;
+    readonly agentIcon: Locator;
+    readonly suggestImprovementButton: Locator;
 
     constructor(page: Page) {
         this.page = page;
 
         // data-testid locators from NewDashboardNavbar.tsx
         this.closeButton = page.getByTestId('support-drawer-close-button');
+        this.dialogCloseButton = page.getByTestId('support-dialog-close-button');
         this.contactItem = page.getByTestId('support-contact-item');
         this.liveChatItem = page.getByTestId('support-live-chat-item');
+        this.agentIcon = page.getByTestId('support-agent-icon');
+        this.suggestImprovementButton = page.getByTestId('suggest-improvement-button');
     }
 
     async close(): Promise<void> {

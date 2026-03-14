@@ -24,6 +24,16 @@ export class SettingsPage {
     readonly billingCycleToggle: Locator;
     readonly getStartedButtons: Locator;
 
+    // Payment
+    readonly paymentAddCardButton: Locator;
+    readonly paymentBackToCardsButton: Locator;
+    readonly paymentConfirmButton: Locator;
+    readonly pricingDrawerCloseButton: Locator;
+
+    // Notification
+    readonly notificationConfigureButton: Locator;
+    readonly notificationEnableButton: Locator;
+
     constructor(page: Page) {
         this.page = page;
 
@@ -39,6 +49,16 @@ export class SettingsPage {
         this.billingAddDetailsButton = page.getByTestId('billing-add-details-button');
         this.billingCycleToggle = page.getByTestId('plans-billing-cycle-toggle');
         this.getStartedButtons = page.getByTestId('plans-get-started-button');
+
+        // Payment — from PaymentMethodsSection.tsx
+        this.paymentAddCardButton = page.getByTestId('payment-add-card-button');
+        this.paymentBackToCardsButton = page.getByTestId('payment-back-to-cards-button');
+        this.paymentConfirmButton = page.getByTestId('payment-confirm-button');
+        this.pricingDrawerCloseButton = page.getByTestId('pricing-drawer-close-button');
+
+        // Notification — from NotificationComponent.tsx
+        this.notificationConfigureButton = page.getByTestId('notification-configure-button');
+        this.notificationEnableButton = page.getByTestId('notification-enable-button');
     }
 
     // --- Delegated: Workspace Settings drawer ---

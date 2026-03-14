@@ -10,6 +10,8 @@ export class AnalyticsComponent {
 
     // Time period selector
     readonly timePeriodSelect: Locator;
+    readonly todayOption: Locator;
+    readonly last7DaysOption: Locator;
 
     // Filter tabs container and individual tabs
     readonly filterTabs: Locator;
@@ -20,6 +22,8 @@ export class AnalyticsComponent {
 
         // data-testid locators from AnalyticsMetrics.tsx
         this.timePeriodSelect = page.getByTestId('dashboard-analytics-time-period-select');
+        this.todayOption = page.getByTestId('dashboard-analytics-today-option');
+        this.last7DaysOption = page.getByTestId('dashboard-analytics-last7days-option');
 
         // data-testid locators from FilterFlows.tsx
         this.filterTabs = page.getByTestId('dashboard-filter-tabs');

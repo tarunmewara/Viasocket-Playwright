@@ -44,6 +44,9 @@ export class WorkspacePage {
     readonly orgCardAction: Locator;
     readonly renameInput: Locator;
 
+    // Beta dialog
+    readonly betaDialog: Locator;
+
     // Create Workspace modal (composed)
     readonly createModal: CreateWorkspaceModal;
 
@@ -62,30 +65,31 @@ export class WorkspacePage {
         this.betaSwitch = page.getByTestId('workspace-beta-switch');
         this.betaConfirmButton = page.getByTestId('workspace-beta-confirm');
         this.betaCancelButton = page.getByTestId('workspace-beta-cancel');
+        this.betaDialog = page.getByTestId('workspace-beta-dialog');
 
         // data-testid locators from LeaveWorkspaceButton.tsx
         this.leaveWorkspaceButton = page.getByTestId('leave-workspace-open-button');
         this.leaveWorkspaceConfirmButton = page.getByTestId('leave-workspace-confirm-button');
         this.leaveWorkspaceCancelButton = page.getByTestId('leave-workspace-cancel-button');
 
-        // Role/text locators for workspace selection page (data-testid stripped in prod)
-        this.backButton = page.getByRole('button', { name: 'back' });
-        this.searchInput = page.getByPlaceholder('Search');
-        this.createNewWorkspaceButton = page.getByRole('button', { name: 'Create New Workspace' });
-        this.renameInput = page.locator('.title-textfield input');
+        // data-testid locators from WorkspacesComponent.tsx / AllOrgs.tsx
+        this.backButton = page.getByTestId('workspace-back-button');
+        this.searchInput = page.getByTestId('workspace-search-input');
+        this.createNewWorkspaceButton = page.getByTestId('workspace-create-new-button');
+        this.renameInput = page.getByTestId('workspace-rename-input');
 
         // AllOrgs.tsx — DataGrid (>10 orgs) or card view (≤10 orgs)
-        this.orgDataGrid = page.getByRole('grid');
-        this.orgCardAction = page.getByRole('button').filter({ hasText: /Domain.*Timezone/ });
+        this.orgDataGrid = page.getByTestId('org-datagrid');
+        this.orgCardAction = page.getByTestId('org-card-action');
 
         // Create Workspace modal (composed)
         this.createModal = new CreateWorkspaceModal(page);
 
-        // Profile menu (role/text locators — data-testid stripped in prod)
-        this.profileMenuButton = page.locator('.workspace__page button').filter({ has: page.locator('.MuiTypography-h6') }).first();
-        this.profileMenu = page.getByRole('menu');
-        this.profileEditMenuItem = page.getByRole('menuitem', { name: 'Edit Profile' });
-        this.profileLogoutMenuItem = page.getByRole('menuitem', { name: 'Logout' });
+        // Profile menu (WorkspacesComponent.tsx)
+        this.profileMenuButton = page.getByTestId('workspace-profile-menu-button');
+        this.profileMenu = page.getByTestId('profile-menu');
+        this.profileEditMenuItem = page.getByTestId('workspace-edit-profile-menu-item');
+        this.profileLogoutMenuItem = page.getByTestId('workspace-logout-menu-item');
 
         // Role/text based locators (workSpaceLink items have no data-testid)
         this.switchWorkspaceLink = page.getByRole('button', { name: 'Switch Workspace' });

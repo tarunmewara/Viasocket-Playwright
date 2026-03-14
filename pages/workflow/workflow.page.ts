@@ -22,6 +22,33 @@ export class WorkflowPage {
     readonly flowTitleInput: Locator;
     readonly pauseActiveToggle: Locator;
 
+    // Dry run / test
+    readonly dryRunTestButton: Locator;
+    readonly dryRunTestFlowButton: Locator;
+    readonly dryRunSkipDelayToggle: Locator;
+    readonly dryRunExpandResponse: Locator;
+    readonly dryRunStepTestButton: Locator;
+
+    // Debug
+    readonly debugByAiPerformButton: Locator;
+
+    // Function slider
+    readonly functionSliderTestButton: Locator;
+    readonly functionSliderAiOptimizeButton: Locator;
+    readonly functionSliderTestTransferButton: Locator;
+
+    // Event / step
+    readonly eventActionCard: Locator;
+    readonly eventNextButton: Locator;
+    readonly singleStepConfigureButton: Locator;
+
+    // Warning / publish
+    readonly warningPanelPublishButton: Locator;
+
+    // JSON editor
+    readonly jsonEditorChatgptLink: Locator;
+    readonly jsonEditorExampleJsonLink: Locator;
+
     constructor(page: Page) {
         this.page = page;
 
@@ -34,6 +61,33 @@ export class WorkflowPage {
         // Page-unique locators
         this.flowTitleInput = page.getByTestId('flow-title-input');
         this.pauseActiveToggle = page.getByTestId('flow-pause-active-toggle');
+
+        // Dry run / test
+        this.dryRunTestButton = page.getByTestId('dry-run-test-button');
+        this.dryRunTestFlowButton = page.getByTestId('dry-run-test-flow-button');
+        this.dryRunSkipDelayToggle = page.getByTestId('dry-run-skip-delay-toggle');
+        this.dryRunExpandResponse = page.getByTestId('dry-run-expand-response');
+        this.dryRunStepTestButton = page.getByTestId('dry-run-step-test-button');
+
+        // Debug
+        this.debugByAiPerformButton = page.getByTestId('debug-by-ai-perform-button');
+
+        // Function slider
+        this.functionSliderTestButton = page.getByTestId('function-slider-test-button');
+        this.functionSliderAiOptimizeButton = page.getByTestId('function-slider-ai-optimize-button');
+        this.functionSliderTestTransferButton = page.getByTestId('function-slider-test-transfer-button');
+
+        // Event / step
+        this.eventActionCard = page.getByTestId('event-action-card');
+        this.eventNextButton = page.getByTestId('event-next-button');
+        this.singleStepConfigureButton = page.getByTestId('single-step-configure-button');
+
+        // Warning / publish
+        this.warningPanelPublishButton = page.getByTestId('warning-panel-publish-button');
+
+        // JSON editor
+        this.jsonEditorChatgptLink = page.getByTestId('json-editor-chatgpt-link');
+        this.jsonEditorExampleJsonLink = page.getByTestId('json-editor-example-json-link');
     }
 
     // --- Publish ---

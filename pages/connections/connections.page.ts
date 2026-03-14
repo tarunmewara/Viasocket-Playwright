@@ -31,6 +31,11 @@ export class ConnectionsPage {
     // Update connection (when user is the owner)
     readonly updateConnectionButton: Locator;
 
+    // Row details
+    readonly rowExpandButton: Locator;
+    readonly labelMaskCheckbox: Locator;
+    readonly labelNameTextfield: Locator;
+
     // No results
     readonly noMatchingText: Locator;
 
@@ -51,6 +56,11 @@ export class ConnectionsPage {
         // Update buttons — from allAppsTable.tsx, UpdateOrRequestConnectionUpdate.tsx
         this.updateConnectionOpenButton = page.getByTestId('connection-update-open-button');
         this.updateConnectionButton = page.getByTestId('connections-update-button');
+
+        // Row details — from DrawerforSpecificConnection.tsx
+        this.rowExpandButton = page.getByTestId('connections-row-expand-button');
+        this.labelMaskCheckbox = page.getByTestId('connection-label-mask-checkbox');
+        this.labelNameTextfield = page.getByTestId('connection-label-name-textfield');
 
         // Empty state
         this.noMatchingText = page.getByText('No matching apps found.');

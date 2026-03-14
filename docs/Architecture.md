@@ -41,14 +41,21 @@ Viasocket-Playwright/
 ├── components/                        # Reusable UI component abstractions
 │   ├── common/                        # Shared components
 │   │   ├── close-slider.component.ts  # Slider back/close/next buttons
-│   │   └── copy-button.component.ts   # Copy-to-clipboard button
+│   │   ├── copy-button.component.ts   # Copy-to-clipboard button
+│   │   ├── local-notification.component.ts  # In-app notification banners
+│   │   └── misc.component.ts          # AI action, alert publish, assign expert, pagination, etc.
 │   ├── connections/                   # Connection panel components
 │   │   ├── connection-drawer.component.ts    # Connection detail drawer
 │   │   ├── auth-level-selector.component.ts  # Access level selector (org/collection/flow)
 │   │   └── service-drawer.component.ts       # Service-level connection drawer
 │   ├── dashboard/                     # Dashboard components
-│   │   ├── support-drawer.component.ts       # Support drawer (contact, live chat)
+│   │   ├── support-drawer.component.ts       # Support drawer (contact, live chat, agent icon)
 │   │   └── analytics.component.ts            # Analytics time period, filter tabs
+│   ├── developer-hub/                 # Developer Hub components
+│   │   ├── reusable-components.component.ts  # Add/edit/delete/import reusable components
+│   │   ├── field-editor.component.ts         # Field renderer, data field CRUD, scope separator
+│   │   ├── component-slider.component.ts     # Component slider — params, save, test, generate
+│   │   └── api-config.component.ts           # API whitelist config, header settings
 │   ├── logs/                          # Logs components
 │   │   └── logs-filter.component.ts   # Filter, rerun, date pickers
 │   ├── navbar/                        # Top navigation bar
@@ -73,35 +80,54 @@ Viasocket-Playwright/
 │       ├── webhook.component.ts       # Webhook trigger selection
 │       ├── cron.component.ts          # Cron trigger configuration
 │       ├── condition.component.ts     # "Run Flow If" condition toggle/input
-│       └── logs-viewer.component.ts   # Log accordion, expand/collapse, return to flow
+│       ├── logs-viewer.component.ts   # Log accordion, expand/collapse, return to flow
+│       └── expert-feedback.component.ts     # Expert feedback — thumbs up/down, comment
 │
-├── modals/                            # Modal dialog abstractions (14 modals)
+├── modals/                            # Modal dialog abstractions (21 modals)
 │   ├── create-collection.modal.ts     # Create collection (name, suggestions, submit)
 │   ├── rename-collection.modal.ts     # Rename collection (input, RENAME button)
 │   ├── create-org.modal.ts            # Create organization (workspace name, industry, domain)
+│   ├── create-workspace.modal.ts      # Create workspace (name, industry, employees, domain)
 │   ├── delete-flow.modal.ts           # Delete flow confirmation
 │   ├── duplicate-flow.modal.ts        # Duplicate/move/create flow/template
-│   ├── share-flow.modal.ts            # Share flow (copy link, create template)
+│   ├── share-flow.modal.ts            # Share flow (copy link, template, version, visibility)
 │   ├── publish-confirm.modal.ts       # Publish confirmation
 │   ├── feedback.modal.ts              # Feedback (idea/issue, text, submit)
 │   ├── go-live-confirm.modal.ts       # Go live confirmation (Yes)
 │   ├── stop-transfer.modal.ts         # Stop transfer confirmation
 │   ├── delete-auth.modal.ts           # Delete auth/connection confirmation
 │   ├── auth-success.modal.ts          # Auth success popup (done, edit title)
+│   ├── auth-version.modal.ts          # Auth type/version approve/reject (DH)
 │   ├── leave-workspace.modal.ts       # Leave workspace confirmation
 │   ├── mcp-client-select.modal.ts     # MCP client selection dialog
-│   └── update-connection.modal.ts     # Update connection (reason, send request)
+│   ├── update-connection.modal.ts     # Update connection (reason, send request)
+│   ├── create-auth-field.modal.ts     # Create auth field (DH) — required, URL checkboxes
+│   ├── add-field.modal.ts             # Add field (DH) — key/value/type, key switch
+│   ├── project-rename.modal.ts        # Project rename (input, confirm, cancel)
+│   ├── storage.modal.ts               # Storage collection creation
+│   ├── success.modal.ts               # Post-action success dialog (start, done)
+│   └── billing.modal.ts               # Billing submit/cancel/done dialog
 │
 ├── pages/                             # Page Object classes (organized by feature)
 │   ├── collection/
 │   │   └── collection.page.ts         # Collection listing, context menu
 │   ├── connections/
-│   │   └── connections.page.ts        # Connection listing, add, toggle view
+│   │   └── connections.page.ts        # Connection listing, add, toggle view, row details
 │   ├── dashboard/
-│   │   ├── dashboard.page.ts          # Org selection, flow cards, wallet, search
-│   │   └── workspace.page.ts          # Workspace CRUD, switch, profile menu
+│   │   ├── dashboard.page.ts          # Org selection, flow cards, wallet, search, navbar
+│   │   └── workspace.page.ts          # Workspace CRUD, switch, profile menu, beta dialog
+│   ├── developer-hub/                 # Developer Hub pages
+│   │   ├── developer-hub.page.ts      # DH actions — save, test, dry run, alerts, auth, tabs
+│   │   ├── plugin.page.ts             # Plugin listing, details, preview, scope, workspace
+│   │   ├── action-form.page.ts        # Action CRUD, version, scopes, AI generation
+│   │   ├── auth-section.page.ts       # Auth config, types, versions, basic auth, code challenge
+│   │   └── analytics-dh.page.ts       # DH analytics — actions, triggers, errors, versions
+│   ├── error/
+│   │   └── error.page.ts             # Error screen, 404 not found, user go back
 │   ├── interface/
-│   │   └── interface-config.page.ts   # Embed display config (23 toggles/inputs)
+│   │   └── interface-config.page.ts   # Embed display config (23 toggles/inputs, filters)
+│   ├── login/
+│   │   └── login.page.ts             # Login page links (privacy, terms)
 │   ├── mcp/
 │   │   └── mcp.page.ts               # MCP server client selection
 │   ├── metrics/
@@ -109,14 +135,14 @@ Viasocket-Playwright/
 │   ├── oauth/
 │   │   └── oauth.page.ts             # OAuth integrations, URI management
 │   ├── settings/
-│   │   └── settings.page.ts          # Workspace settings, billing, offers
+│   │   └── settings.page.ts          # Workspace settings, billing, offers, payment, notification
 │   ├── templates/
 │   │   └── templates.page.ts         # Template search, sort, filters
 │   ├── transfer/
 │   │   └── transfer.page.ts          # Data transfer orchestration
 │   └── workflow/
-│       ├── workflow.page.ts           # Flow builder (actions, test, save, go live)
-│       ├── triggers.page.ts           # Trigger selection (webhook, cron, plugin)
+│       ├── workflow.page.ts           # Flow builder (actions, test, dry run, debug, events)
+│       ├── triggers.page.ts           # Trigger selection (webhook, cron, plugin, radio group)
 │       ├── logs.page.ts               # Logs page (filter, rerun, pause/active)
 │       └── flow-options.page.ts       # Flow more options menu
 │
@@ -319,33 +345,41 @@ export const test = base.extend<MyFixtures>({
 
 ### Current Coverage (mapped from `socket-flow-UI` data-testid)
 
+**All 479 `data-testid` attributes from `socket-flow-UI/src` are now mapped to 497 `getByTestId()` locators across Playwright POMs (0 missing).**
+
 | Module | Page Object | data-testid Count | Status |
 |--------|-------------|-------------------|--------|
-| Authentication | `ConnectionsPage` | ~20 | Full — CRUD, auth levels, service drawer, delete |
-| Dashboard | `DashboardPage` | ~18 | Full — org cards, analytics, filter tabs, support, create org |
-| Workspaces | `WorkspacePage` | ~15 | Full — CRUD, profile menu, beta toggle, rename, logout |
+| Authentication | `ConnectionsPage` | ~23 | Full — CRUD, auth levels, service drawer, delete, row expand, label mask |
+| Dashboard | `DashboardPage` | ~24 | Full — org cards, analytics, filter tabs, support, create org, navbar, hamburger |
+| Workspaces | `WorkspacePage` | ~18 | Full — CRUD, profile menu, beta toggle/dialog, rename, logout, org datagrid |
 | Collections | `CollectionPage` | ~6 | Full — create, rename, trash, pause/active |
-| Sidepanel | `SidepanelPage` | ~8 | Full — navigation links |
-| Flow Builder | `WorkflowPage` | ~12 | Full — navbar, breadcrumb, assign expert, slider controls |
-| Triggers | `TriggersPage` | ~10 | Full — webhook, cron, conditions |
+| Sidepanel | `SidepanelPage` | ~11 | Full — navigation links, toggle, advanced menu |
+| Flow Builder | `WorkflowPage` | ~28 | Full — navbar, breadcrumb, dry run, debug, function slider, events, JSON editor |
+| Triggers | `TriggersPage` | ~12 | Full — webhook, cron, conditions, trigger list, radio group |
 | Logs | `LogsPage` | ~16 | Full — filter, rerun, date range, expand/collapse |
 | Flow Options | `FlowOptionsPage` | ~10 | Full — delete, duplicate, move, share |
 | Publish | `PublishPage` | ~14 | Full — go live, discard, template preview, feedback |
-| Interface Config | `InterfaceConfigPage` | ~23 | Full — embed display toggles, webhooks, layout |
+| Share Flow | `ShareFlowModal` | ~12 | Full — open, close, copy link, template, version, visibility, AI review |
+| Interface Config | `InterfaceConfigPage` | ~26 | Full — embed display toggles, webhooks, layout, filters |
 | Transfer | `TransferPage` | ~13 | Full — review, status, stop/resume, pagination |
-| Settings | `SettingsPage` | ~14 | Full — workspace settings, billing, offers, partners |
+| Settings | `SettingsPage` | ~20 | Full — workspace settings, billing, offers, payment, notification |
 | Templates | `TemplatesPage` | ~4 | Full — search, sort, filter |
 | MCP | `MCPPage` | ~4 | Full — client selection, URL visibility |
-| Components | `JSCode`, `Webhook`, `Logs` | N/A | Composed into parent pages |
-
-### Recommended Additions
-
-1. **More Action Types**: Email, Transform, Filter, Delay components (add as `components/`)
-2. **OAuth/Integration Page**: `oauthConfig.tsx` has data-testids — add `OAuthPage` when needed
-3. **Developer Hub**: `developerHub/` has extensive data-testids — add when DH testing begins
-4. **Error Handling Tests**: Validation, error messages
-5. **Data-Driven Tests**: Parameterized test cases
-6. **Visual Regression**: Screenshot comparisons
+| OAuth | `OAuthPage` | ~10 | Full — integrations, URI management |
+| Developer Hub | `DeveloperHubPage` | ~17 | Full — DH actions, alerts, auth, tabs, custom actions |
+| DH Plugin | `PluginPage` | ~15 | Full — listing, details, preview, scope, workspace |
+| DH Action Form | `ActionFormPage` | ~17 | Full — action CRUD, version, scopes, AI generation |
+| DH Auth Section | `AuthSectionPage` | ~28 | Full — auth config, types, versions, basic auth, code challenge |
+| DH Analytics | `DhAnalyticsPage` | ~15 | Full — actions guide, errors, force update, run logs |
+| DH Components | `ComponentSliderComponent` | ~15 | Full — params, save, test, generate, search |
+| DH Fields | `FieldEditorComponent` | ~15 | Full — field renderer, data field CRUD, scope separator |
+| DH Reusable | `ReusableComponentsComponent` | ~8 | Full — add, edit, delete, import |
+| DH API Config | `ApiConfigComponent` | ~3 | Full — whitelist, header settings |
+| Error/404 | `ErrorPage` | ~7 | Full — error screen, not found, go back |
+| Login | `LoginPage` | ~2 | Full — privacy, terms links |
+| Misc Modals | Various | ~15 | Full — storage, success, billing, project-rename, add-field, auth-version |
+| Misc Components | `MiscComponent` | ~11 | Full — AI action, alert publish, assign expert, pagination |
+| Components | `JSCode`, `Webhook`, `Logs`, `ExpertFeedback` | N/A | Composed into parent pages |
 
 ---
 

@@ -18,18 +18,23 @@ export class DashboardPage {
     readonly walletButton: Locator;
     readonly searchButton: Locator;
     readonly backButton: Locator;
+    readonly hamburgerMenuButton: Locator;
+    readonly navbarAccountButton: Locator;
+    readonly navbarLogoutButton: Locator;
 
     // Headings
     readonly metricsHeading: Locator;
 
     // Flow / Automation list
     readonly flowCard: Locator;
+    readonly flowCardLocationLink: Locator;
     readonly recentWorkflowItem: Locator;
 
     // Collection sidebar
     readonly collectionAllButton: Locator;
     readonly collectionCreateButton: Locator;
     readonly collectionListItem: Locator;
+    readonly createNewCollectionButton: Locator;
 
     // Create New Flow
     readonly createNewFlowButton: Locator;
@@ -50,15 +55,20 @@ export class DashboardPage {
         this.walletButton = page.getByTestId('dashboard-wallet-button');
         this.searchButton = page.getByTestId('dashboard-search-button');
         this.backButton = page.getByTestId('dashboard-back-button');
+        this.hamburgerMenuButton = page.getByTestId('hamburger-menu-button');
+        this.navbarAccountButton = page.getByTestId('navbar-account-button');
+        this.navbarLogoutButton = page.getByTestId('navbar-logout-button');
 
         // Flow cards & recent workflows
         this.flowCard = page.getByTestId('flow-card');
+        this.flowCardLocationLink = page.getByTestId('flow-card-location-link');
         this.recentWorkflowItem = page.getByTestId('recent-workflow-item');
 
         // Collections
         this.collectionAllButton = page.getByTestId('collection-all-button');
         this.collectionCreateButton = page.getByTestId('collection-create-button');
         this.collectionListItem = page.getByTestId('collection-list-item');
+        this.createNewCollectionButton = page.getByTestId('create-new-collection-button');
 
         // Create New Flow
         this.createNewFlowButton = page.getByRole('button', { name: 'Create New Flow' });

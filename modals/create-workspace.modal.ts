@@ -18,13 +18,13 @@ export class CreateWorkspaceModal {
     constructor(page: Page) {
         this.page = page;
 
-        // Role/text/placeholder locators (data-testid stripped in prod build)
-        this.workspaceNameInput = page.getByPlaceholder('Workspace name');
-        this.industryInput = page.getByPlaceholder('Example :- IT');
-        this.employeesInput = page.getByText('Number of Employees').locator('..').getByRole('combobox');
-        this.domainInput = page.getByPlaceholder('Your official website address');
-        this.submitButton = page.getByRole('button', { name: 'Create' });
-        this.closeButton = page.getByRole('button', { name: 'Close' });
+        // data-testid locators from createOrgModal.tsx
+        this.workspaceNameInput = page.getByTestId('create-org-workspace-name-input');
+        this.industryInput = page.getByTestId('create-org-industry-input');
+        this.employeesInput = page.getByTestId('create-org-employees-input');
+        this.domainInput = page.getByTestId('create-org-domain-input');
+        this.submitButton = page.getByTestId('create-org-submit-button');
+        this.closeButton = page.getByTestId('create-org-close-button');
     }
 
     async fillWorkspaceName(name: string): Promise<void> {
