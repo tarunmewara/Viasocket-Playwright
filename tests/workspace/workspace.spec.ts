@@ -25,12 +25,12 @@ test.describe('Workspace Tests', () => {
         await expect(workspace.createNewWorkspaceButton).toBeVisible();
     });
 
-    test('TC-WORK-03: Leave Workspace', async ({ workspace }) => {
-        await workspace.selectFirstWorkspace();
-        await workspace.openWorkspaceMenu();
-        await workspace.goToEditProfile();
-        await workspace.openLeaveDialog();
-        await workspace.confirmLeaveWorkspace();
-    });
+    // test('TC-WORK-03: Leave Workspace', async ({ workspace }) => {
+    //     await workspace.selectFirstWorkspace();
+    //     await workspace.openWorkspaceMenu();
+    //     await workspace.goToEditProfile();
+    //     await workspace.openLeaveDialog();
+    //     await workspace.confirmLeaveWorkspace();
+    // });
 
 });

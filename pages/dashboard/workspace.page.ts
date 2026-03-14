@@ -92,7 +92,7 @@ export class WorkspacePage {
         this.profileLogoutMenuItem = page.getByTestId('workspace-logout-menu-item');
 
         // Role/text based locators (workSpaceLink items have no data-testid)
-        this.switchWorkspaceLink = page.getByRole('button', { name: 'Switch Workspace' });
+        this.switchWorkspaceLink = page.getByRole('link', { name: 'Switch Workspace' });
         this.workspaceSettingsLink = page.getByRole('link', { name: 'Workspace Settings' });
         this.membersLink = page.getByRole('link', { name: 'Members' });
         this.notificationsLink = page.getByRole('link', { name: 'Notifications' });
@@ -137,6 +137,8 @@ export class WorkspacePage {
         const gridRow = this.page.getByRole('row').filter({ has: this.page.getByRole('gridcell') }).first();
         const cardButton = this.orgCardAction.first();
         await gridRow.or(cardButton).first().click();
+        // Wait for navigation to the workspace dashboard
+        await this.page.waitForURL('**/projects/**', { timeout: 30000 });
     }
 
     async getWorkspaceCardCount(): Promise<number> {
@@ -150,7 +152,10 @@ export class WorkspacePage {
     // --- Workspace menu ---
 
     async openWorkspaceMenu(): Promise<void> {
-        await this.workspaceTrigger.click();
+        // Sidebar expanded (default): Stack with org name h6 — no data-testid
+        // Sidebar collapsed: Box with data-testid='workspace-trigger'
+        const expandedTrigger = this.page.locator('h6').first();
+        await this.workspaceTrigger.or(expandedTrigger).first().click();
     }
 
     async switchWorkspace(): Promise<void> {
