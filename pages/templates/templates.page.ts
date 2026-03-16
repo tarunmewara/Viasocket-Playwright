@@ -20,6 +20,7 @@ export class TemplatesPage {
     // --- Search (TemplateSearchInputOptimized.tsx) ---
     readonly searchAutocomplete: Locator;
     readonly searchInput: Locator;
+    readonly searchDropdown: Locator;
     readonly showMoreDepartments: Locator;
     readonly showMoreIndustries: Locator;
 
@@ -49,6 +50,7 @@ export class TemplatesPage {
         // Search — from TemplateSearchInputOptimized.tsx
         this.searchAutocomplete = page.getByTestId('template-search-autocomplete');
         this.searchInput = this.searchAutocomplete.getByRole('combobox');
+        this.searchDropdown = page.getByRole('listbox');
         this.showMoreDepartments = page.getByTestId('template-search-show-more-departments');
         this.showMoreIndustries = page.getByTestId('template-search-show-more-industries');
 
@@ -119,6 +121,12 @@ export class TemplatesPage {
 
     async clickTemplateCard(index: number = 0): Promise<void> {
         await this.templateCards.nth(index).click();
+    }
+
+    async installTemplate(index: number = 0): Promise<void> {
+        const card = this.templateCards.nth(index);
+        await card.hover();
+        await card.getByText('Install Template').click();
     }
 
     async clickTemplateByTitle(title: string): Promise<void> {
