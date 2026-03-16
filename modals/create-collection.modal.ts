@@ -26,7 +26,7 @@ export class CreateCollectionModal {
         this.page = page;
 
         // Role/text based locators from createInputModalV2.tsx
-        this.dialogTitle = page.getByRole('heading', { name: 'New Collection' });
+        this.dialogTitle = page.locator('#responsive-dialog-title').filter({ hasText: 'New Collection' });
         this.nameInput = page.getByLabel('Name of Collection');
         this.suggestionsContainer = page.getByText('Quick Suggestions');
         this.suggestionChips = page.getByRole('button').filter({ has: page.locator('.MuiChip-root') });
@@ -43,11 +43,11 @@ export class CreateCollectionModal {
     }
 
     async clickSuggestion(chipText: string): Promise<void> {
-        await this.page.locator('.MuiChip-root').filter({ hasText: chipText }).click();
+        await this.page.getByRole('dialog').locator('.MuiChip-root').filter({ hasText: chipText }).click();
     }
 
     async clickNthSuggestion(index: number): Promise<void> {
-        await this.page.locator('.MuiChip-root').nth(index).click();
+        await this.page.getByRole('dialog').locator('.MuiChip-root').nth(index).click();
     }
 
     async create(): Promise<void> {

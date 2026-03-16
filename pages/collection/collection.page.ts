@@ -1,9 +1,10 @@
 import { Page, Locator } from '@playwright/test';
+import { CreateCollectionModal } from '../../modals/create-collection.modal';
 import { RenameCollectionModal } from '../../modals/rename-collection.modal';
 
 /**
  * Collection Page
- * Composes: RenameCollectionModal
+ * Composes: CreateCollectionModal, RenameCollectionModal
  * Handles: collection sidebar listing, "All" button, collection items with status chips,
  * context menu (Rename, Pause, Active, Move To Trash), Create Collection trigger
  * Reference: CollectionList.tsx, FunctionsActionsButton
@@ -26,6 +27,9 @@ export class CollectionPage {
     // --- Context menu (FunctionsActionsButton) ---
     readonly actionsMenuTrigger: Locator;
     readonly actionsMenuItem: Locator;
+
+    // --- Create dialog (composed) ---
+    readonly createModal: CreateCollectionModal;
 
     // --- Rename dialog (composed) ---
     readonly renameDialogTitle: Locator;
@@ -50,6 +54,9 @@ export class CollectionPage {
         this.actionsMenuTrigger = page.getByTestId('actions-menu-trigger');
         this.actionsMenuItem = page.getByTestId('actions-menu-item');
 
+        // Create dialog (composed)
+        this.createModal = new CreateCollectionModal(page);
+
         // Rename dialog (composed)
         this.renameDialogTitle = page.getByRole('heading', { name: 'Rename Collection' });
         this.renameModal = new RenameCollectionModal(page);
@@ -73,6 +80,17 @@ export class CollectionPage {
 
     async clickCreateCollection(): Promise<void> {
         await this.createCollectionButton.click();
+    }
+
+    async createCollectionWithName(name: string): Promise<void> {
+        await this.clickCreateCollection();
+        await this.createModal.createWithName(name);
+    }
+
+    async createCollectionFromSuggestion(index: number = 0): Promise<void> {
+        await this.clickCreateCollection();
+        await this.createModal.clickNthSuggestion(index);
+        await this.createModal.create();
     }
 
     // --- Context menu ---
