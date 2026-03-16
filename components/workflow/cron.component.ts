@@ -39,7 +39,7 @@ export class CronComponent {
         // data-testid locator from closeSlidersButtonV2.tsx
         this.nextButton = page.getByTestId('slider-next-button');
 
-        this.cronInput = page.getByTestId('cron-statement-input');
+        this.cronInput = page.getByTestId('cron-statement-input').locator('input');
         this.setCronButton = page.getByTestId('cron-save-button');
         this.timezoneInput = page.getByTestId('cron-timezone-input');
         this.expressionToggle = page.getByTestId('cron-expression-toggle');
