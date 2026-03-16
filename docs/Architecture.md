@@ -110,7 +110,7 @@ Viasocket-Playwright/
 │
 ├── pages/                             # Page Object classes (organized by feature)
 │   ├── collection/
-│   │   └── collection.page.ts         # Collection listing, context menu
+│   │   └── collection.page.ts         # Collection listing, create, rename, context menu (composes CreateCollectionModal, RenameCollectionModal)
 │   ├── connections/
 │   │   └── connections.page.ts        # Connection listing, add, toggle view, row details
 │   ├── dashboard/
