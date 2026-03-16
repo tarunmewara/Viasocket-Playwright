@@ -33,6 +33,12 @@ export class CronComponent {
     // Change workspace timezone box (data-testid='cron-change-timezone')
     readonly changeTimezone: Locator;
 
+    // Expression TextField shown after Expression toggle (data-testid='cron-expression-field')
+    readonly expressionField: Locator;
+
+    // The actual <input> inside the timezone Autocomplete
+    readonly timezoneInputField: Locator;
+
     constructor(page: Page) {
         this.page = page;
 
@@ -42,7 +48,9 @@ export class CronComponent {
         this.cronInput = page.getByTestId('cron-statement-input').locator('input');
         this.setCronButton = page.getByTestId('cron-save-button');
         this.timezoneInput = page.getByTestId('cron-timezone-input');
+        this.timezoneInputField = page.getByTestId('cron-timezone-input').locator('input');
         this.expressionToggle = page.getByTestId('cron-expression-toggle');
+        this.expressionField = page.getByTestId('cron-expression-field');
         this.timezoneMissing = page.getByTestId('cron-timezone-missing');
         this.getDataButton = page.getByTestId('cron-get-data-button');
         this.changeTimezone = page.getByTestId('cron-change-timezone');
@@ -63,4 +71,19 @@ export class CronComponent {
     async isNextVisible(): Promise<boolean> {
         return this.nextButton.isVisible();
     }
+
+    async selectTimezone(timezone: string): Promise<void> {
+        await this.timezoneInputField.click();
+        await this.timezoneInputField.fill(timezone);
+        await this.page.getByRole('option').filter({ hasText: timezone }).first().click();
+    }
+
+    async clickExpressionToggle(): Promise<void> {
+        await this.expressionToggle.click();
+    }
+
+    async isExpressionFieldVisible(): Promise<boolean> {
+        return this.expressionField.isVisible();
+    }
+
 }

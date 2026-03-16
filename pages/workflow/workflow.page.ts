@@ -67,6 +67,13 @@ export class WorkflowPage {
     // Step header — data-testid='step-change-button' (stepNameComponentV2.tsx)
     readonly stepChangeButton: Locator;
 
+    // Trigger step nodes on canvas
+    // CronComponent.tsx inFlow StepNode  → data-testid='inflow-node-cron'
+    // InflowDisplayComponent.tsx StepNode → data-testid='inflow-node-{slugName}'
+    readonly inflowCronNode: Locator;       // inflow-node-cron
+    readonly inflowWebhookNode: Locator;    // inflow-node-webhook
+    readonly inflowEmailNode: Locator;      // inflow-node-email
+
     constructor(page: Page) {
         this.page = page;
 
@@ -124,6 +131,11 @@ export class WorkflowPage {
 
         // Step header
         this.stepChangeButton = page.getByTestId('step-change-button');
+
+        // Trigger step nodes on canvas
+        this.inflowCronNode = page.getByTestId('inflow-node-cron');
+        this.inflowWebhookNode = page.getByTestId('inflow-node-webhook');
+        this.inflowEmailNode = page.getByTestId('inflow-node-email');
     }
 
     // --- Publish ---
