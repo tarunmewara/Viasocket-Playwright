@@ -16,6 +16,7 @@ import { InterfaceConfigPage } from '../pages/interface/interface-config.page';
 import { MCPPage } from '../pages/mcp/mcp.page';
 import { MetricsPage } from '../pages/metrics/metrics.page';
 import { OAuthPage } from '../pages/oauth/oauth.page';
+import { WorkspaceNotesPage } from '../pages/workspace-notes/workspace-notes.page';
 
 // Define the types for our custom fixtures
 type MyFixtures = {
@@ -34,6 +35,7 @@ type MyFixtures = {
     mcp: MCPPage;
     metrics: MetricsPage;
     oauth: OAuthPage;
+    workspaceNotes: WorkspaceNotesPage;
 };
 
 // Extend the base test with our custom fixtures
@@ -82,6 +84,9 @@ export const test = base.extend<MyFixtures>({
     },
     oauth: async ({ page }, use) => {
         await use(new OAuthPage(page));
+    },
+    workspaceNotes: async ({ page }, use) => {
+        await use(new WorkspaceNotesPage(page));
     },
 });
 
