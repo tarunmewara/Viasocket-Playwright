@@ -75,12 +75,12 @@ export class MCPPage {
         // Step cards (by subtitle text)
         this.stepOneCard = page.getByText('Get Your MCP Endpoint');
         this.stepTwoCard = page.getByText('Choose Your Actions');
-        this.stepThreeCard = page.getByText('Connect Your AI Assistant');
+        this.stepThreeCard = page.getByRole('heading', { name: 'Connect Your AI Assistant' });
         this.learnMoreLink = page.getByRole('link', { name: 'Learn More' });
 
         // Landing page actions
         this.getStartedButton = page.getByRole('button', { name: 'Get Started' });
-        this.createNewButton = page.getByRole('button', { name: 'Create New' });
+        this.createNewButton = page.getByRole('button', { name: 'Create New' }).and(page.locator(':not([data-testid])'));
         this.generateSecureUrlButton = page.getByRole('button', { name: 'Generate Secure URL' });
 
         // DataGrid
@@ -174,7 +174,7 @@ export class MCPPage {
     }
 
     async selectClientByName(clientName: string): Promise<void> {
-        await this.page.getByRole('heading', { name: clientName }).click();
+        await this.page.getByRole('heading', { name: clientName }).first().click();
     }
 
     async closeClientDialog(): Promise<void> {
