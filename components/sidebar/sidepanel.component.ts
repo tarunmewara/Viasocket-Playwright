@@ -40,7 +40,7 @@ export class SidepanelComponent {
         // data-testid based locators
         this.createNewFlowButton = page.getByTestId('project-slider-create-flow-btn');
         this.metricsLink = page.getByTestId('project-sidebar-metrics-btn');
-        this.mcpServerLink = page.getByTestId('project-sidebar-mcp-server-btn');
+        this.mcpServerLink = page.getByTestId('project-sidebar-mcp-server-btn').first();
         this.aiAgentsLink = page.getByTestId('project-sidebar-ai-agents-btn');
         this.memoryLink = page.getByTestId('project-sidebar-memory-btn');
         this.workspaceNotesLink = page.getByTestId('project-sidebar-workspace-notes-btn');

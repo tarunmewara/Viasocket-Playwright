@@ -12,6 +12,11 @@ export default defineConfig({
     globalSetup: './auth/global-setup.ts',
     testDir: './tests',
 
+    /* Ignore legacy root-level spec files — they import from old POM paths
+     * (../pages/DashboardPage etc.) that no longer exist and break the full run.
+     * These are superseded by the reorganized files under tests/workflow/, tests/dashboard/ etc. */
+    testIgnore: ['**/tests/*.spec.ts'],
+
     /* Run tests in files in parallel */
     fullyParallel: true,
 

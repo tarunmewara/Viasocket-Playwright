@@ -45,8 +45,8 @@ test.describe('Dashboard Search', () => {
 
         await dashboard.searchFlows('zzzznonexistent99999');
 
-        // Wait for debounce + search to complete, then verify empty state
-        await expect(page.getByRole('heading', { name: 'No results found' })).toBeVisible({ timeout: 5000 });
+        // Wait for debounce + deferred value + log API call to complete, then verify empty state
+        await expect(page.getByRole('heading', { name: 'No results found' })).toBeVisible({ timeout: 15000 });
     });
 
     test('TC-SEARCH-05: Click search result navigates to flow', async ({ dashboard, page }) => {

@@ -140,6 +140,8 @@ Viasocket-Playwright/
 │   │   └── templates.page.ts         # Template search, sort, filters
 │   ├── transfer/
 │   │   └── transfer.page.ts          # Data transfer orchestration
+│   ├── workspace-notes/
+│   │   └── workspace-notes.page.ts   # Workspace notes heading, description, DocStar container
 │   └── workflow/
 │       ├── workflow.page.ts           # Flow builder (actions, test, dry run, debug, events)
 │       ├── triggers.page.ts           # Trigger selection (webhook, cron, plugin, radio group)
@@ -170,6 +172,8 @@ Viasocket-Playwright/
 │   │   └── connections.spec.ts
 │   ├── transfer/
 │   │   └── transfer.spec.ts
+│   ├── workspace-notes/
+│   │   └── workspace-notes.spec.ts
 │   └── interface/
 │       └── interface-config.spec.ts
 │
@@ -388,7 +392,7 @@ export const test = base.extend<MyFixtures>({
 - [x] All pages extend `BasePage`
 - [x] All page objects use `data-testid` locators (`page.getByTestId()`)
 - [x] All page objects use `safeClick`/`safeFill` patterns
-- [x] All 17 fixtures registered in `base.fixture.ts`
+- [x] All 18 fixtures registered in `base.fixture.ts`
 - [x] `TestDataUtils` provides data generators
 - [x] `ApiHelpers` available for API operations
 - [x] Consistent method naming (camelCase, async)

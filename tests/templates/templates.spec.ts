@@ -211,4 +211,194 @@ test.describe('Template Tests', () => {
             expect(cardCount).toBeGreaterThan(0);
         });
     });
+
+    test.describe('Create New Template Modal', () => {
+
+        test('TC-TMPL-21: Open Create New Template modal shows radio options', async ({ templates, page }) => {
+            await templates.clickCreateNewTemplate();
+
+            // Modal should show "Create Template From" with New Flow / Existing Flow radios
+            await expect(page.getByText('Create Template From')).toBeVisible({ timeout: 5000 });
+            await expect(page.getByRole('radio', { name: 'New Flow' })).toBeVisible();
+            await expect(page.getByRole('radio', { name: 'Existing Flow' })).toBeVisible();
+        });
+
+        test('TC-TMPL-22: New Flow mode shows Collection dropdown and Create Template button', async ({ templates, page }) => {
+            await templates.clickCreateNewTemplate();
+
+            await expect(page.getByText('Create Template From')).toBeVisible({ timeout: 5000 });
+
+            // "New Flow" should be selected by default
+            await expect(page.getByRole('radio', { name: 'New Flow' })).toBeChecked();
+
+            // Collection dropdown and Create Template button should be visible
+            await expect(page.getByText('Collection', { exact: true })).toBeVisible();
+            await expect(page.getByTestId('create-template-confirm-button')).toBeVisible();
+        });
+
+        test('TC-TMPL-23: Switch to Existing Flow mode shows flow autocomplete', async ({ templates, page }) => {
+            await templates.clickCreateNewTemplate();
+
+            await expect(page.getByText('Create Template From')).toBeVisible({ timeout: 5000 });
+
+            // Click "Existing Flow" radio
+            await page.getByRole('radio', { name: 'Existing Flow' }).click();
+            await expect(page.getByRole('radio', { name: 'Existing Flow' })).toBeChecked();
+
+            // "Select Flow" label and autocomplete should appear
+            await expect(page.getByText('Select Flow')).toBeVisible();
+        });
+
+        test('TC-TMPL-24: Cancel Create New Template modal closes it', async ({ templates, page }) => {
+            await templates.clickCreateNewTemplate();
+
+            await expect(page.getByTestId('create-template-confirm-button')).toBeVisible({ timeout: 5000 });
+
+            await page.getByTestId('duplicate-flow-cancel-button').click();
+
+            await expect(page.getByTestId('create-template-confirm-button')).not.toBeVisible();
+        });
+
+        test('TC-TMPL-25: Create Template button disabled without collection in New Flow mode', async ({ templates, page }) => {
+            await templates.clickCreateNewTemplate();
+
+            await expect(page.getByTestId('create-template-confirm-button')).toBeVisible({ timeout: 5000 });
+
+            // Without selecting a collection, the button should be disabled
+            await expect(page.getByTestId('create-template-confirm-button')).toBeDisabled();
+        });
+
+        test('TC-TMPL-26: Select collection enables Create Template button', async ({ templates, page }) => {
+            await templates.clickCreateNewTemplate();
+
+            await expect(page.getByText('Collection', { exact: true })).toBeVisible({ timeout: 5000 });
+
+            // Select "No Collection" from the collection dropdown
+            await page.getByText('No Collection').click();
+            await page.getByRole('option', { name: /No Collection/ }).click();
+
+            await expect(page.getByTestId('create-template-confirm-button')).toBeEnabled();
+        });
+
+        test('TC-TMPL-27: Create template from New Flow navigates to workflow', async ({ templates, page }) => {
+            await templates.clickCreateNewTemplate();
+
+            await expect(page.getByText('Collection', { exact: true })).toBeVisible({ timeout: 5000 });
+
+            // Select "No Collection" — click the combobox to open, then pick the option
+            await page.getByText('No Collection').click();
+            await page.getByRole('option', { name: /No Collection/ }).click();
+            await expect(page.getByTestId('create-template-confirm-button')).toBeEnabled();
+
+            await page.getByTestId('create-template-confirm-button').click();
+
+            // Should navigate to the workflow draft page
+            await expect(page).toHaveURL(/\/workflow\/.*\/draft/, { timeout: 15000 });
+        });
+    });
+
+    test.describe('Install Template', () => {
+
+        test('TC-TMPL-28: Template detail page shows Install Template heading', async ({ templates, page }) => {
+            const cardCount = await templates.getTemplateCardCount();
+            if (cardCount === 0) {
+                test.skip();
+                return;
+            }
+
+            await templates.installTemplate(0);
+            await expect(page).toHaveURL(/\/template\//, { timeout: 10000 });
+
+            await expect(page.getByRole('heading', { name: 'Install Template' })).toBeVisible({ timeout: 10000 });
+        });
+
+        test('TC-TMPL-29: Template detail page shows workspace and collection dropdowns', async ({ templates, page }) => {
+            const cardCount = await templates.getTemplateCardCount();
+            if (cardCount === 0) {
+                test.skip();
+                return;
+            }
+
+            await templates.installTemplate(0);
+            await expect(page).toHaveURL(/\/template\//, { timeout: 10000 });
+
+            await expect(page.getByText('Select Workspace')).toBeVisible({ timeout: 10000 });
+            await expect(page.getByText('Collection', { exact: true })).toBeVisible();
+        });
+
+        test('TC-TMPL-30: Template detail page shows Install and Cancel buttons', async ({ templates, page }) => {
+            const cardCount = await templates.getTemplateCardCount();
+            if (cardCount === 0) {
+                test.skip();
+                return;
+            }
+
+            await templates.installTemplate(0);
+            await expect(page).toHaveURL(/\/template\//, { timeout: 10000 });
+
+            await expect(page.getByRole('button', { name: 'Install' })).toBeVisible({ timeout: 10000 });
+            await expect(page.getByRole('button', { name: 'Cancel' })).toBeVisible();
+        });
+
+        test('TC-TMPL-31: Cancel on template detail navigates back', async ({ templates, page }) => {
+            const cardCount = await templates.getTemplateCardCount();
+            if (cardCount === 0) {
+                test.skip();
+                return;
+            }
+
+            await templates.installTemplate(0);
+            await expect(page).toHaveURL(/\/template\//, { timeout: 10000 });
+
+            await page.getByRole('button', { name: 'Cancel' }).click();
+
+            // Should navigate back (URL should no longer contain /template/)
+            await expect(page).not.toHaveURL(/\/template\//, { timeout: 10000 });
+        });
+
+        test('TC-TMPL-32: Select collection and install template navigates to workflow', async ({ templates, page }) => {
+            const cardCount = await templates.getTemplateCardCount();
+            if (cardCount === 0) {
+                test.skip();
+                return;
+            }
+
+            await templates.installTemplate(0);
+            await expect(page).toHaveURL(/\/template\//, { timeout: 10000 });
+
+            // Wait for collection dropdown to load
+            await expect(page.getByText('Collection', { exact: true })).toBeVisible({ timeout: 10000 });
+
+            // Select "No Collection" from the dropdown — click combobox to open, then pick option
+            await page.getByText('No Collection').click();
+            await page.getByRole('option', { name: /No Collection/ }).click();
+
+            // Click Install
+            await page.getByRole('button', { name: 'Install' }).click();
+
+            // Should navigate to the workflow draft page
+            await expect(page).toHaveURL(/\/workflow\/.*\/draft/, { timeout: 15000 });
+        });
+
+        test('TC-TMPL-33: Installed template workflow shows configure button', async ({ templates, workflow, page }) => {
+            const cardCount = await templates.getTemplateCardCount();
+            if (cardCount === 0) {
+                test.skip();
+                return;
+            }
+
+            await templates.installTemplate(0);
+            await expect(page).toHaveURL(/\/template\//, { timeout: 10000 });
+
+            await expect(page.getByText('Collection', { exact: true })).toBeVisible({ timeout: 10000 });
+            await page.getByText('No Collection').click();
+            await page.getByRole('option', { name: /No Collection/ }).click();
+
+            await page.getByRole('button', { name: 'Install' }).click();
+            await expect(page).toHaveURL(/\/workflow\/.*\/draft/, { timeout: 15000 });
+
+            // Workflow page should show single-step configure button
+            await expect(workflow.singleStepConfigureButton.first()).toBeVisible({ timeout: 10000 });
+        });
+    });
 });
