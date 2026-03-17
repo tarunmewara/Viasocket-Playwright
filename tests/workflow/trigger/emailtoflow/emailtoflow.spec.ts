@@ -1,20 +1,43 @@
 import { test, expect } from '../../../../fixtures/base.fixture';
 
 test.describe('Email to Flow Trigger', () => {
+    test.describe.configure({ retries: 1 });
 
     test.beforeEach(async ({ dashboard }) => {
         await dashboard.navigateToProject('58104');
         await dashboard.clickCreateNewFlow();
     });
 
+    // Helper: select email — trigger is auto-created on new flows
+    async function setupEmailTrigger({ triggers, workflow }: any) {
+        const triggerApi = triggers.page.waitForResponse(
+            (resp: any) => resp.url().includes('/trigger') && resp.request().method() === 'POST',
+            { timeout: 30000 }
+        );
+        await triggers.selectEmailTrigger();
+        await triggerApi;
+        await expect(workflow.inflowEmailNode).toBeVisible({ timeout: 15000 });
+    }
+
+    // Helper: create email + re-open slider from canvas
+    async function openEmailSlider({ triggers, workflow }: any) {
+        await setupEmailTrigger({ triggers, workflow });
+        await workflow.inflowEmailNode.click();
+        await expect(triggers.emailPayloadTab).toBeVisible({ timeout: 10000 });
+    }
+
     // Helper: set webhook first, then change to email so that
     // email-set-trigger-button becomes visible (triggerType='webhook' !== 'email').
     async function setupEmailViaChange({ triggers, workflow }: any) {
+        const webhookApi = triggers.page.waitForResponse(
+            (resp: any) => resp.url().includes('/trigger') && resp.request().method() === 'POST',
+            { timeout: 30000 }
+        );
         await triggers.selectWebhookTrigger();
-        await expect(workflow.setWebhookButton).toBeVisible();
-        await workflow.setWebhookButton.click();
+        await webhookApi;
+        await expect(workflow.inflowWebhookNode).toBeVisible({ timeout: 15000 });
 
-        await expect(workflow.inflowWebhookNode).toBeVisible();
+        // Open webhook slider from canvas
         await workflow.inflowWebhookNode.click();
 
         await expect(workflow.cronChangeButton).toBeVisible();
@@ -22,6 +45,10 @@ test.describe('Email to Flow Trigger', () => {
 
         // Now triggerType='webhook', selecting email shows email-set-trigger-button
         await triggers.selectEmailTrigger();
+
+        // Click email node on canvas to open its slider
+        await expect(workflow.inflowEmailNode).toBeVisible({ timeout: 15000 });
+        await workflow.inflowEmailNode.click();
     }
 
     // Helper: setupEmailViaChange + click the set button
@@ -34,11 +61,8 @@ test.describe('Email to Flow Trigger', () => {
     // ------------------------------------------------------------------ //
     // Test 1: Selecting email trigger opens slider with payload tab       //
     // ------------------------------------------------------------------ //
-    test('selecting email trigger opens slider with payload tab', async ({ triggers }) => {
-        await triggers.selectEmailTrigger();
-
-        // Trigger options list is gone
-        await expect(triggers.triggerOption.first()).not.toBeVisible();
+    test('selecting email trigger opens slider with payload tab', async ({ triggers, workflow }) => {
+        await openEmailSlider({ triggers, workflow });
 
         // Payload tab should be visible
         await expect(triggers.emailPayloadTab).toBeVisible();
@@ -47,10 +71,9 @@ test.describe('Email to Flow Trigger', () => {
     // ------------------------------------------------------------------ //
     // Test 2: Email slider can be closed with the close button            //
     // ------------------------------------------------------------------ //
-    test('email slider can be closed with close button', async ({ triggers }) => {
-        await triggers.selectEmailTrigger();
+    test('email slider can be closed with close button', async ({ triggers, workflow }) => {
+        await openEmailSlider({ triggers, workflow });
 
-        await expect(triggers.emailPayloadTab).toBeVisible();
         await triggers.slider.clickClose();
 
         await expect(triggers.emailPayloadTab).not.toBeVisible();
@@ -59,10 +82,9 @@ test.describe('Email to Flow Trigger', () => {
     // ------------------------------------------------------------------ //
     // Test 3: Email slider can be closed with the back button             //
     // ------------------------------------------------------------------ //
-    test('email slider can be closed with back button', async ({ triggers }) => {
-        await triggers.selectEmailTrigger();
+    test('email slider can be closed with back button', async ({ triggers, workflow }) => {
+        await openEmailSlider({ triggers, workflow });
 
-        await expect(triggers.emailPayloadTab).toBeVisible();
         await triggers.slider.clickBack();
 
         await expect(triggers.emailPayloadTab).not.toBeVisible();

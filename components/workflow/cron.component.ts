@@ -1,4 +1,5 @@
 import { Page, Locator } from '@playwright/test';
+import { TriggersComponent } from '../triggers/triggers.component';
 
 /**
  * Cron Component
@@ -99,6 +100,7 @@ export class CronComponent {
     }
 
     async save(): Promise<void> {
+        await this.cronInput.press('Tab');
         await this.setCronButton.click();
     }
 
