@@ -67,6 +67,12 @@ export class WorkflowPage {
     // Step header — data-testid='step-change-button' (stepNameComponentV2.tsx)
     readonly stepChangeButton: Locator;
 
+    // Change button in cron/trigger slider header (WhenStepNameComponent.tsx)
+    readonly cronChangeButton: Locator;     // data-testid='when-change-trigger-button'
+
+    // Webhook slider — Set webhook button (webhookComponent.tsx — data-testid='webhook-set-button')
+    readonly setWebhookButton: Locator;
+
     // Trigger step nodes on canvas
     // CronComponent.tsx inFlow StepNode  → data-testid='inflow-node-cron'
     // InflowDisplayComponent.tsx StepNode → data-testid='inflow-node-{slugName}'
@@ -131,6 +137,12 @@ export class WorkflowPage {
 
         // Step header
         this.stepChangeButton = page.getByTestId('step-change-button');
+
+        // Cron slider Change button
+        this.cronChangeButton = page.getByTestId('when-change-trigger-button');
+
+        // Webhook slider Set webhook button (data-testid='webhook-set-button' in webhookComponent.tsx)
+        this.setWebhookButton = page.getByTestId('webhook-set-button');
 
         // Trigger step nodes on canvas
         this.inflowCronNode = page.getByTestId('inflow-node-cron');

@@ -33,6 +33,33 @@ export class TriggersPage {
     // Search bar back/navigation button (AddStepSlider.tsx — data-testid='slider-search-back-button')
     readonly sliderSearchBackButton: Locator;
 
+    // --- Webhook trigger slider (webhookComponent.tsx) ---
+    // webhook-set-button is on WorkflowPage (workflow.setWebhookButton)
+    // 'Get data' button (data-testid='webhook-get-data-button')
+    readonly webhookGetDataButton: Locator;
+    // Tabs container (data-testid='webhook-tabs')
+    readonly webhookTabs: Locator;
+    // Payload tab (data-testid='webhook-payload-tab')
+    readonly webhookPayloadTab: Locator;
+    // Send Sample Data tab (data-testid='webhook-send-sample-tab')
+    readonly webhookSendSampleTab: Locator;
+    // Add Sample Payload button in inFlow mode (data-testid='webhook-add-sample-payload-button')
+    readonly webhookAddSamplePayloadButton: Locator;
+
+    // --- Email trigger slider (emailToFlowComponent.tsx) ---
+    // 'Set email trigger' button (data-testid='email-set-trigger-button')
+    readonly emailSetTriggerButton: Locator;
+    // Payload tab (data-testid='email-payload-tab')
+    readonly emailPayloadTab: Locator;
+
+    // --- Plugin trigger action list (ActionsListAutocomplete.tsx) ---
+    // Back arrow in plugin action list (data-testid='plugin-trigger-back-button')
+    readonly pluginTriggerBackButton: Locator;
+    // Search input in action list (data-testid='action-search-input')
+    readonly actionSearchInput: Locator;
+    // Each action/trigger item row (data-testid='trigger-action-item')
+    readonly triggerActionItem: Locator;
+
     constructor(page: Page) {
         this.page = page;
         this.slider = new CloseSliderComponent(page);
@@ -49,6 +76,22 @@ export class TriggersPage {
         this.triggerOption = page.getByTestId('trigger-option');
         this.builtinToolOption = page.getByTestId('builtin-tool-option');
         this.sliderSearchBackButton = page.getByTestId('slider-search-back-button');
+
+        // Webhook trigger
+        this.webhookGetDataButton = page.getByTestId('webhook-get-data-button');
+        this.webhookTabs = page.getByTestId('webhook-tabs');
+        this.webhookPayloadTab = page.getByTestId('webhook-payload-tab');
+        this.webhookSendSampleTab = page.getByTestId('webhook-send-sample-tab');
+        this.webhookAddSamplePayloadButton = page.getByTestId('webhook-add-sample-payload-button');
+
+        // Email trigger
+        this.emailSetTriggerButton = page.getByTestId('email-set-trigger-button');
+        this.emailPayloadTab = page.getByTestId('email-payload-tab');
+
+        // Plugin trigger action list
+        this.pluginTriggerBackButton = page.getByTestId('plugin-trigger-back-button');
+        this.actionSearchInput = page.getByTestId('action-search-input');
+        this.triggerActionItem = page.getByTestId('trigger-action-item');
     }
 
     // --- Slider ---

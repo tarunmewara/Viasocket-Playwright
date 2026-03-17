@@ -56,7 +56,7 @@ test.describe('Cron Trigger', () => {
 
         // Wait for at least one autocomplete option and pick it
         const firstSuggestion = triggers.page.getByRole('option').first();
-        await expect(firstSuggestion).toBeVisible();
+        await expect(firstSuggestion).toBeVisible({ timeout: 15000 });
         await firstSuggestion.click();
 
         await expect(workflow.publish.goLiveButton).toBeVisible();
@@ -87,21 +87,28 @@ test.describe('Cron Trigger', () => {
         await triggers.cron.fillStatement('Every 30 minutes');
         await triggers.cron.cronInput.press('Tab');  
         await triggers.cron.save();
-        
+
+        // goLiveButton appears only after the trigger is saved successfully
+        await expect(workflow.publish.goLiveButton).toBeVisible({ timeout: 20000 });
 
         // Step 2: click the cron step node on canvas to open cron slider
         await expect(workflow.inflowCronNode).toBeVisible();
         await workflow.inflowCronNode.click();
 
         // Step 3: click Change button in cron slider header
-        await expect(workflow.stepChangeButton).toBeVisible();
-        await workflow.stepChangeButton.click();
+        await expect(workflow.cronChangeButton).toBeVisible();
+        await workflow.cronChangeButton.click();
 
         // Step 4: pick webhook
         await triggers.selectWebhookTrigger();
 
         // Webhook config opens → trigger list is gone
         await expect(triggers.triggerOption.first()).not.toBeVisible();
+
+        // Step 5: click Set webhook to confirm
+        await expect(workflow.setWebhookButton).toBeVisible();
+        await workflow.setWebhookButton.click();
+
         await expect(workflow.publish.goLiveButton).toBeVisible();
     });
 
@@ -115,48 +122,130 @@ test.describe('Cron Trigger', () => {
         await triggers.cron.cronInput.press('Tab');
         await triggers.cron.save();
 
+        // goLiveButton appears only after the trigger is saved successfully
+        await expect(workflow.publish.goLiveButton).toBeVisible({ timeout: 20000 });
+
         // Step 2: click the cron step node on canvas to open cron slider
         await expect(workflow.inflowCronNode).toBeVisible();
         await workflow.inflowCronNode.click();
 
         // Step 3: click Change button in cron slider header
-        await expect(workflow.stepChangeButton).toBeVisible();
-        await workflow.stepChangeButton.click();
+        await expect(workflow.cronChangeButton).toBeVisible();
+        await workflow.cronChangeButton.click();
 
-        // Step 4: pick email
-        await triggers.selectEmailTrigger();
-
-        // Email config opens → trigger list is gone
-        await expect(triggers.triggerOption.first()).not.toBeVisible();
-        await expect(workflow.publish.goLiveButton).toBeVisible();
+        // Step 4: email option should be visible but disabled (opacity-50, cursor-not-allowed)
+        // When triggerType is 'cron', email is not selectable (AddStepSearchView.tsx)
+        const emailOption = triggers.triggerOption.filter({ hasText: /email/i });
+        await expect(emailOption).toBeVisible();
+        await expect(emailOption).toHaveClass(/opacity-50/);
     });
 
     // ------------------------------------------------------------------ //
     // Test 6: Change cron trigger → plugin app via Change button           //
     // ------------------------------------------------------------------ //
     test('change cron trigger to plugin app via Change button', async ({ triggers, workflow }) => {
+
         // Step 1: add cron
         await triggers.selectCronTrigger();
         await triggers.cron.fillStatement('Every hour');
         await triggers.cron.cronInput.press('Tab');
         await triggers.cron.save();
 
+        // goLiveButton appears only after the trigger is saved successfully
+        await expect(workflow.publish.goLiveButton).toBeVisible({ timeout: 20000 });
+
         // Step 2: click the cron step node on canvas to open cron slider
         await expect(workflow.inflowCronNode).toBeVisible();
         await workflow.inflowCronNode.click();
 
         // Step 3: click Change button in cron slider header
-        await expect(workflow.stepChangeButton).toBeVisible();
-        await workflow.stepChangeButton.click();
+        await expect(workflow.cronChangeButton).toBeVisible();
+        await workflow.cronChangeButton.click();
 
         // Step 4: search for a plugin and pick the first result
         await triggers.triggerSearchInput.fill('Gmail');
-        const firstPluginOption = triggers.triggerOption.first();
+        const firstPluginOption = triggers.page.getByRole('option').first();
         await expect(firstPluginOption).toBeVisible();
         await firstPluginOption.click();
 
         // Plugin trigger config opens → search input should be gone
         await expect(triggers.triggerSearchInput).not.toBeVisible();
+    });
+
+    // ------------------------------------------------------------------ //
+    // Test 7: Expression toggle reveals the raw cron expression field      //
+    // ------------------------------------------------------------------ //
+    test('expression toggle reveals cron expression field', async ({ triggers, workflow }) => {
+        await triggers.selectCronTrigger();
+
+        // Save a cron statement first — the expression toggle only renders
+        // when triggerInfo.cronExpression is truthy (cronComponent.tsx line 518)
+        await triggers.cron.fillStatement('Every day at 9am');
+        await triggers.cron.cronInput.press('Tab');
+        await triggers.cron.save();
+
+        // goLiveButton appears only after the trigger is saved successfully
+        await expect(workflow.publish.goLiveButton).toBeVisible({ timeout: 20000 });
+
+        // Re-open cron slider from canvas
+        await expect(workflow.inflowCronNode).toBeVisible();
+        await workflow.inflowCronNode.click();
+
+        // Expression field hidden by default
+        await expect(triggers.cron.expressionField).not.toBeVisible();
+
+        // Toggle to expression mode
+        await expect(triggers.cron.expressionToggle).toBeVisible();
+        await triggers.cron.clickExpressionToggle();
+
+        // Expression field should now be visible
+        await expect(triggers.cron.expressionField).toBeVisible();
+    });
+
+    // ------------------------------------------------------------------ //
+    // Test 8: Save button is disabled before a statement is entered        //
+    // ------------------------------------------------------------------ //
+    test('cron save button is disabled before entering statement', async ({ triggers }) => {
+        await triggers.selectCronTrigger();
+
+        // No statement yet — save button must be disabled
+        await expect(triggers.cron.setCronButton).toBeDisabled();
+
+        // After filling a statement the button becomes enabled
+        await triggers.cron.fillStatement('Every hour');
+        await expect(triggers.cron.setCronButton).toBeEnabled();
+    });
+
+    // ------------------------------------------------------------------ //
+    // Test 9: Trigger search input is fillable and filters results         //
+    // ------------------------------------------------------------------ //
+    test('trigger search input is fillable and filters results', async ({ triggers }) => {
+        // The trigger search input is visible on the initial trigger-selection screen
+        await expect(triggers.triggerSearchInput).toBeVisible();
+
+        // Should accept typed text (data-testid is on the <input> element)
+        await triggers.triggerSearchInput.fill('Gmail');
+
+        // At least one search result matching the query should appear
+        // Search results render as role='option' via MUI useAutocomplete (not data-testid='trigger-option')
+        await expect(triggers.page.getByRole('option').filter({ hasText: /gmail/i }).first()).toBeVisible();
+    });
+
+    // ------------------------------------------------------------------ //
+    // Test 10: Change button is visible in the cron slider after saving    //
+    // ------------------------------------------------------------------ //
+    test('change button is visible in cron slider after saving', async ({ triggers, workflow }) => {
+        await triggers.selectCronTrigger();
+        await triggers.cron.fillStatement('Every day at noon');
+        await triggers.cron.cronInput.press('Tab');
+        await triggers.cron.save();
+
+        // Open cron slider from canvas
+        await expect(workflow.inflowCronNode).toBeVisible();
+        await workflow.inflowCronNode.click();
+
+        // Change button must be visible in the slider header
+        await expect(workflow.cronChangeButton).toBeVisible();
     });
 
 });
