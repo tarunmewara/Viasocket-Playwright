@@ -42,9 +42,9 @@ export default defineConfig({
 
     /* Shared settings for all the projects below. */
     use: {
-        // screenshot: 'on',
-        // video: 'on',
-        // trace: 'on',
+        screenshot: 'only-on-failure',
+        video: 'retain-on-failure',
+        trace: 'retain-on-failure',
 
         baseURL: process.env.BASE_URL,
 
