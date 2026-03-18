@@ -420,4 +420,263 @@ test.describe('JS Code — Built-in Tool', () => {
         await expect(workflow.jscode.codeEditorTextbox).not.toBeVisible();
     });
 
+    // ── TC-JSC-081 ────────────────────────────────────────────────────────────
+    test('TC-JSC-081: Single-character variable name is accepted', async ({ workflow }) => {
+        await workflow.jscode.toggleInputValues();
+        await workflow.jscode.addVariable('x');
+        await expect(workflow.jscode.variableNameLabel('x')).toBeVisible();
+        await expect(workflow.jscode.variableValueInputs()).toHaveCount(1);
+    });
+
+    // ── TC-JSC-082 ────────────────────────────────────────────────────────────
+    test('TC-JSC-082: Variable name containing digits is accepted', async ({ workflow }) => {
+        await workflow.jscode.toggleInputValues();
+        await workflow.jscode.addVariable('var123');
+        await expect(workflow.jscode.variableNameLabel('var123')).toBeVisible();
+    });
+
+    // ── TC-JSC-083 ────────────────────────────────────────────────────────────
+    test('TC-JSC-083: Long variable name is accepted and label visible', async ({ workflow }) => {
+        await workflow.jscode.toggleInputValues();
+        await workflow.jscode.addVariable('thisIsAVeryLongVariableNameForTesting');
+        await expect(workflow.jscode.variableNameLabel('thisIsAVeryLongVariableNameForTesting')).toBeVisible();
+    });
+
+    // ── TC-JSC-084 ────────────────────────────────────────────────────────────
+    test('TC-JSC-084: Variable value with JSON content is stored correctly', async ({ workflow }) => {
+        await workflow.jscode.toggleInputValues();
+        await workflow.jscode.addVariable('config');
+        await workflow.jscode.fillVariableValue('{"key":"value","num":42}');
+        await expect(workflow.jscode.variableValueAt()).toHaveValue('{"key":"value","num":42}');
+    });
+
+    // ── TC-JSC-085 ────────────────────────────────────────────────────────────
+    test('TC-JSC-085: Variable value with special characters is stored correctly', async ({ workflow }) => {
+        await workflow.jscode.toggleInputValues();
+        await workflow.jscode.addVariable('special');
+        await workflow.jscode.fillVariableValue('<div>&amp;"quotes"</div>');
+        await expect(workflow.jscode.variableValueAt()).toHaveValue('<div>&amp;"quotes"</div>');
+    });
+
+    // ── TC-JSC-086 ────────────────────────────────────────────────────────────
+    test('TC-JSC-086: Variable value can be cleared after filling', async ({ workflow }) => {
+        await workflow.jscode.toggleInputValues();
+        await workflow.jscode.addVariable('temp');
+        await workflow.jscode.fillVariableValue('some data');
+        await expect(workflow.jscode.variableValueAt()).toHaveValue('some data');
+        await workflow.jscode.fillVariableValue('');
+        await expect(workflow.jscode.variableValueAt()).toHaveValue('');
+    });
+
+    // ── TC-JSC-087 ────────────────────────────────────────────────────────────
+    test('TC-JSC-087: Description with special characters is stored correctly', async ({ workflow }) => {
+        await workflow.jscode.fillDescription('Handle <input> & "edge" cases');
+        await expect(workflow.jscode.descriptionTextarea).toHaveValue('Handle <input> & "edge" cases');
+    });
+
+    // ── TC-JSC-088 ────────────────────────────────────────────────────────────
+    test('TC-JSC-088: Description persists after expanding and collapsing Input Values', async ({ workflow }) => {
+        await workflow.jscode.fillDescription('persist check');
+        await workflow.jscode.toggleInputValues();
+        await workflow.jscode.toggleInputValues();
+        await expect(workflow.jscode.descriptionTextarea).toHaveValue('persist check');
+    });
+
+    // ── TC-JSC-089 ────────────────────────────────────────────────────────────
+    test('TC-JSC-089: Description persists after expanding and collapsing Code accordion', async ({ workflow }) => {
+        await workflow.jscode.fillDescription('still here');
+        await workflow.jscode.toggleCode();
+        await workflow.jscode.toggleCode();
+        await expect(workflow.jscode.descriptionTextarea).toHaveValue('still here');
+    });
+
+    // ── TC-JSC-090 ────────────────────────────────────────────────────────────
+    test('TC-JSC-090: Code editor textbox is empty on initial expand', async ({ workflow }) => {
+        await workflow.jscode.toggleCode();
+        await expect(workflow.jscode.codeEditorTextbox).toBeVisible();
+        await expect(workflow.jscode.codeEditor).not.toContainText('return');
+    });
+
+    // ── TC-JSC-091 ────────────────────────────────────────────────────────────
+    test('TC-JSC-091: Code with only a comment is accepted in the editor', async ({ workflow }) => {
+        await workflow.jscode.toggleCode();
+        await workflow.jscode.fillCode('// this is a comment');
+        await expect(workflow.jscode.codeEditor).toContainText('// this is a comment');
+    });
+
+    // ── TC-JSC-092 ────────────────────────────────────────────────────────────
+    test('TC-JSC-092: Code can be cleared after writing — editor no longer contains old text', async ({ workflow }) => {
+        await workflow.jscode.toggleCode();
+        await workflow.jscode.fillCode('return 99');
+        await expect(workflow.jscode.codeEditor).toContainText('return 99');
+        await workflow.jscode.clearCode();
+        await expect(workflow.jscode.codeEditor).not.toContainText('return 99');
+    });
+
+    // ── TC-JSC-093 ────────────────────────────────────────────────────────────
+    test('TC-JSC-093: TEST button stays disabled after adding only variables (no code)', async ({ workflow }) => {
+        await expect(workflow.jscode.testButton).toBeDisabled();
+        await workflow.jscode.toggleInputValues();
+        await workflow.jscode.addVariable('onlyVar');
+        await workflow.jscode.fillVariableValue('someValue');
+        await expect(workflow.jscode.testButton).toBeDisabled();
+    });
+
+    // ── TC-JSC-094 ────────────────────────────────────────────────────────────
+    test('TC-JSC-094: Save with only description filled — slider closes, step on canvas', async ({ workflow }) => {
+        await workflow.jscode.fillDescription('Description only save');
+        await workflow.jscode.save();
+        await expect(workflow.jscode.testButton).not.toBeVisible();
+        await expect(workflow.jscode.jsCodeStepNode).toBeVisible();
+    });
+
+    // ── TC-JSC-095 ────────────────────────────────────────────────────────────
+    test('TC-JSC-095: Save with only variables added — slider closes, step on canvas', async ({ workflow }) => {
+        await workflow.jscode.toggleInputValues();
+        await workflow.jscode.addVariable('saveVar');
+        await workflow.jscode.fillVariableValue('saveVal');
+        await workflow.jscode.save();
+        await expect(workflow.jscode.testButton).not.toBeVisible();
+        await expect(workflow.jscode.jsCodeStepNode).toBeVisible();
+    });
+
+    // ── TC-JSC-096 ────────────────────────────────────────────────────────────
+    test('TC-JSC-096: Save and re-open — TEST and Save buttons are both visible', async ({ workflow }) => {
+        await workflow.jscode.save();
+        await expect(workflow.jscode.testButton).not.toBeVisible();
+        await workflow.jscode.reopenEditor();
+        await expect(workflow.jscode.testButton).toBeVisible();
+        await expect(workflow.jscode.saveButton).toBeVisible();
+    });
+
+    // ── TC-JSC-097 ────────────────────────────────────────────────────────────
+    test('TC-JSC-097: Cancel add variable does not collapse the Input Values accordion', async ({ workflow }) => {
+        await workflow.jscode.toggleInputValues();
+        await workflow.jscode.clickAddVariable();
+        await workflow.jscode.cancelAddVariable();
+        // Accordion should still be expanded — Add Variable button visible
+        await expect(workflow.jscode.addVariableBtn).toBeVisible();
+    });
+
+    // ── TC-JSC-098 ────────────────────────────────────────────────────────────
+    test('TC-JSC-098: Adding a variable after a previous cancel works correctly', async ({ workflow }) => {
+        await workflow.jscode.toggleInputValues();
+        await workflow.jscode.clickAddVariable();
+        await workflow.jscode.fillVariableName('cancelled');
+        await workflow.jscode.cancelAddVariable();
+        // Now add a variable successfully
+        await workflow.jscode.addVariable('success');
+        await expect(workflow.jscode.variableNameLabel('success')).toBeVisible();
+        await expect(workflow.jscode.variableValueInputs()).toHaveCount(1);
+    });
+
+    // ── TC-JSC-099 ────────────────────────────────────────────────────────────
+    test('TC-JSC-099: Variable name input is empty when Add Variable form opens', async ({ workflow }) => {
+        await workflow.jscode.toggleInputValues();
+        await workflow.jscode.clickAddVariable();
+        await expect(workflow.jscode.variableNameInput).toHaveValue('');
+    });
+
+    // ── TC-JSC-100 ────────────────────────────────────────────────────────────
+    test('TC-JSC-100: After adding a variable the add form closes — name input hidden', async ({ workflow }) => {
+        await workflow.jscode.toggleInputValues();
+        await workflow.jscode.addVariable('done');
+        await expect(workflow.jscode.variableNameInput).not.toBeVisible();
+        await expect(workflow.jscode.addVariableBtn).toBeVisible();
+    });
+
+    // ── TC-JSC-101 ────────────────────────────────────────────────────────────
+    test('TC-JSC-101: Five variables can be added — five value inputs appear', async ({ workflow }) => {
+        await workflow.jscode.toggleInputValues();
+        for (const name of ['v1', 'v2', 'v3', 'v4', 'v5']) {
+            await workflow.jscode.addVariable(name);
+        }
+        await expect(workflow.jscode.variableValueInputs()).toHaveCount(5);
+    });
+
+    // ── TC-JSC-102 ────────────────────────────────────────────────────────────
+    test('TC-JSC-102: Code accordion button remains visible when Input Values is expanded', async ({ workflow }) => {
+        await workflow.jscode.toggleInputValues();
+        await expect(workflow.jscode.codeAccordionBtn).toBeVisible();
+    });
+
+    // ── TC-JSC-103 ────────────────────────────────────────────────────────────
+    test('TC-JSC-103: Input Values summary remains visible when Code accordion is expanded', async ({ workflow }) => {
+        await workflow.jscode.toggleCode();
+        await expect(workflow.jscode.inputValuesAccordionSummary).toBeVisible();
+    });
+
+    // ── TC-JSC-104 ────────────────────────────────────────────────────────────
+    test('TC-JSC-104: Multiple toggle cycles on Input Values accordion (3x open/close)', async ({ workflow }) => {
+        for (let i = 0; i < 3; i++) {
+            await workflow.jscode.toggleInputValues();
+            await expect(workflow.jscode.addVariableBtn).toBeVisible();
+            await workflow.jscode.toggleInputValues();
+            await expect(workflow.jscode.addVariableBtn).not.toBeVisible();
+        }
+    });
+
+    // ── TC-JSC-105 ────────────────────────────────────────────────────────────
+    test('TC-JSC-105: Multiple toggle cycles on Code accordion (3x open/close)', async ({ workflow }) => {
+        for (let i = 0; i < 3; i++) {
+            await workflow.jscode.toggleCode();
+            await expect(workflow.jscode.codeEditorTextbox).toBeVisible();
+            await workflow.jscode.toggleCode();
+            await expect(workflow.jscode.codeEditorTextbox).not.toBeVisible();
+        }
+    });
+
+    // ── TC-JSC-106 ────────────────────────────────────────────────────────────
+    test('TC-JSC-106: Variable value textarea is enabled after adding a variable', async ({ workflow }) => {
+        await workflow.jscode.toggleInputValues();
+        await workflow.jscode.addVariable('active');
+        await expect(workflow.jscode.variableValueAt()).toBeEnabled();
+    });
+
+    // ── TC-JSC-107 ────────────────────────────────────────────────────────────
+    test('TC-JSC-107: Description textarea is enabled on initial load', async ({ workflow }) => {
+        await expect(workflow.jscode.descriptionTextarea).toBeEnabled();
+    });
+
+    // ── TC-JSC-108 ────────────────────────────────────────────────────────────
+    test('TC-JSC-108: Save button works after multiple accordion interactions', async ({ workflow }) => {
+        await workflow.jscode.toggleInputValues();
+        await workflow.jscode.addVariable('interacted');
+        await workflow.jscode.toggleInputValues();
+        await workflow.jscode.toggleCode();
+        await workflow.jscode.fillCode('return 1');
+        await workflow.jscode.toggleCode();
+        await workflow.jscode.save();
+        await expect(workflow.jscode.testButton).not.toBeVisible();
+        await expect(workflow.jscode.jsCodeStepNode).toBeVisible();
+    });
+
+    // ── TC-JSC-109 ────────────────────────────────────────────────────────────
+    test('TC-JSC-109: All main panel elements present after adding variables and writing code', async ({ workflow }) => {
+        await workflow.jscode.toggleInputValues();
+        await workflow.jscode.addVariable('check');
+        await workflow.jscode.fillVariableValue('val');
+        await workflow.jscode.toggleCode();
+        await workflow.jscode.fillCode('return input.check');
+        // All main elements still visible
+        await expect(workflow.jscode.descriptionTextarea).toBeVisible();
+        await expect(workflow.jscode.inputValuesAccordionSummary).toBeVisible();
+        await expect(workflow.jscode.codeAccordionBtn).toBeVisible();
+        await expect(workflow.jscode.testButton).toBeVisible();
+        await expect(workflow.jscode.saveButton).toBeVisible();
+    });
+
+    // ── TC-JSC-110 ────────────────────────────────────────────────────────────
+    test('TC-JSC-110: Code and variable content visible simultaneously in their sections', async ({ workflow }) => {
+        await workflow.jscode.toggleInputValues();
+        await workflow.jscode.addVariable('msg');
+        await workflow.jscode.fillVariableValue('hello world');
+        await workflow.jscode.toggleCode();
+        await workflow.jscode.fillCode('return input.msg');
+        // Both sections show their content
+        await expect(workflow.jscode.variableValueAt()).toHaveValue('hello world');
+        await expect(workflow.jscode.variableNameLabel('msg')).toBeVisible();
+        await expect(workflow.jscode.codeEditor).toContainText('return input.msg');
+    });
+
 });

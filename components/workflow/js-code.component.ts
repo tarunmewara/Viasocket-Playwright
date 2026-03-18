@@ -199,10 +199,22 @@ export class JSCodeComponent {
         await this.page.keyboard.type(code);
     }
 
+    async clearCode(): Promise<void> {
+        await this.codeEditorTextbox.waitFor({ state: 'visible' });
+        await this.codeEditorTextbox.click();
+        await this.page.keyboard.press('Control+a');
+        await this.page.keyboard.press('Delete');
+    }
+
     // ── Save ─────────────────────────────────────────────────────────────────
 
     async save(): Promise<void> {
         await this.saveButton.click();
+    }
+
+    async reopenEditor(): Promise<void> {
+        await this.configureStepNode.first().click();
+        await this.waitForPanelReady();
     }
 
     // ── Panel readiness ──────────────────────────────────────────────────────
