@@ -3,6 +3,7 @@ import { PublishControlsComponent } from '../../components/publish/publish-contr
 import { GoLiveConfirmModal } from '../../modals/go-live-confirm.modal';
 import { FeedbackModal } from '../../modals/feedback.modal';
 import { JSCodeComponent } from '../../components/workflow/js-code.component';
+import { HttpApiRequestComponent } from '../../components/workflow/http-api-request.component';
 
 /**
  * Workflow Page
@@ -17,6 +18,7 @@ export class WorkflowPage {
     readonly goLiveConfirm: GoLiveConfirmModal;
     readonly feedback: FeedbackModal;
     readonly jscode: JSCodeComponent;
+    readonly httpApi: HttpApiRequestComponent;
 
     // Page-unique locators
     readonly flowTitleInput: Locator;
@@ -88,6 +90,7 @@ export class WorkflowPage {
         this.goLiveConfirm = new GoLiveConfirmModal(page);
         this.feedback = new FeedbackModal(page);
         this.jscode = new JSCodeComponent(page);
+        this.httpApi = new HttpApiRequestComponent(page);
 
         // Page-unique locators
         this.flowTitleInput = page.locator('#flow-title-textfield');
