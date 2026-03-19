@@ -109,6 +109,12 @@ export class MCPPage {
         this.clientSearchInput = page.getByTestId('mcp-client-search-input');
     }
 
+    // --- Navigation ---
+
+    async navigateFromSidebar(): Promise<void> {
+        await this.page.getByTestId('project-sidebar-mcp-server-btn').first().click();
+    }
+
     // --- Landing page methods ---
 
     async clickGetStarted(): Promise<void> {

@@ -1,6 +1,6 @@
 import { test, expect } from '../../fixtures/base.fixture';
 import { MCPPage } from '../../pages/mcp/mcp.page';
-import { Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
 /**
  * Wait for MCP landing page to stabilize after async MCP list load.
@@ -37,16 +37,14 @@ async function navigateToSelectedMCP(mcp: MCPPage, page: Page): Promise<void> {
 
 test.describe('MCP Module Tests', () => {
 
+    test.beforeEach(async ({ workspace, mcp, page }) => {
+        await workspace.navigateToOrg();
+        await workspace.selectFirstWorkspace();
+        await mcp.navigateFromSidebar();
+        await expect(page).toHaveURL(/\/mcp\//, { timeout: 15000 });
+    });
+
     test.describe('Landing Page', () => {
-
-        test.beforeEach(async ({ workspace, page }) => {
-            await workspace.navigateToOrg();
-            await workspace.selectFirstWorkspace();
-
-            // Navigate to MCP via sidebar
-            await page.getByTestId('project-sidebar-mcp-server-btn').first().click();
-            await expect(page).toHaveURL(/\/mcp\//, { timeout: 15000 });
-        });
 
         test('TC-MCP-01: MCP landing page displays main heading', async ({ mcp }) => {
             await expect(mcp.mainHeading).toBeVisible({ timeout: 10000 });
@@ -91,13 +89,6 @@ test.describe('MCP Module Tests', () => {
 
     test.describe('Create New MCP', () => {
 
-        test.beforeEach(async ({ workspace, page }) => {
-            await workspace.navigateToOrg();
-            await workspace.selectFirstWorkspace();
-            await page.getByTestId('project-sidebar-mcp-server-btn').first().click();
-            await expect(page).toHaveURL(/\/mcp\//, { timeout: 15000 });
-        });
-
         test('TC-MCP-07: Get Started shows Generate Secure URL button', async ({ mcp, page }) => {
             await waitForMCPPageStable(mcp, page);
             const hasExisting = await mcp.existingMCPsHeading.isVisible();
@@ -129,12 +120,7 @@ test.describe('MCP Module Tests', () => {
 
     test.describe('Selected MCP Page', () => {
 
-        test.beforeEach(async ({ workspace, page, mcp }) => {
-            await workspace.navigateToOrg();
-            await workspace.selectFirstWorkspace();
-            await page.getByTestId('project-sidebar-mcp-server-btn').first().click();
-            await expect(page).toHaveURL(/\/mcp\//, { timeout: 15000 });
-
+        test.beforeEach(async ({ page, mcp }) => {
             await navigateToSelectedMCP(mcp, page);
         });
 
@@ -190,12 +176,7 @@ test.describe('MCP Module Tests', () => {
 
     test.describe('Client Selector Dialog', () => {
 
-        test.beforeEach(async ({ workspace, page, mcp }) => {
-            await workspace.navigateToOrg();
-            await workspace.selectFirstWorkspace();
-            await page.getByTestId('project-sidebar-mcp-server-btn').first().click();
-            await expect(page).toHaveURL(/\/mcp\//, { timeout: 15000 });
-
+        test.beforeEach(async ({ page, mcp }) => {
             await navigateToSelectedMCP(mcp, page);
 
             // Switch to Connect tab
