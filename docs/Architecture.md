@@ -93,6 +93,7 @@ Viasocket-Playwright/
 │   ├── share-flow.modal.ts            # Share flow (copy link, template, version, visibility)
 │   ├── publish-confirm.modal.ts       # Publish confirmation
 │   ├── feedback.modal.ts              # Feedback (idea/issue, text, submit)
+│   ├── ask-ai.modal.ts                # Ask AI chatbot panel, Assign to Expert tab
 │   ├── go-live-confirm.modal.ts       # Go live confirmation (Yes)
 │   ├── stop-transfer.modal.ts         # Stop transfer confirmation
 │   ├── delete-auth.modal.ts           # Delete auth/connection confirmation
@@ -157,6 +158,7 @@ Viasocket-Playwright/
 │
 ├── tests/                             # Test spec files organized by feature
 │   ├── workflow/                      # Workflow & trigger tests
+│   │   ├── ask-ai.spec.ts
 │   │   ├── triggers.spec.ts
 │   │   ├── workflow.spec.ts
 │   │   ├── logs.spec.ts
@@ -359,6 +361,7 @@ export const test = base.extend<MyFixtures>({
 | Collections | `CollectionPage` | ~6 | Full — create, rename, trash, pause/active |
 | Sidepanel | `SidepanelPage` | ~11 | Full — navigation links, toggle, advanced menu |
 | Flow Builder | `WorkflowPage` | ~28 | Full — navbar, breadcrumb, dry run, debug, function slider, events, JSON editor |
+| Ask AI | `AskAIModal` (composed in `WorkflowPage`) | ~3 | Full — ask-ai tab, assign-expert tab, close button + text-based locators for empty states |
 | Triggers | `TriggersPage` | ~12 | Full — webhook, cron, conditions, trigger list, radio group |
 | Logs | `LogsPage` | ~16 | Full — filter, rerun, date range, expand/collapse |
 | Flow Options | `FlowOptionsPage` | ~10 | Full — delete, duplicate, move, share |
