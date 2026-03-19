@@ -2,6 +2,7 @@ import { Page, Locator } from '@playwright/test';
 import { CloseSliderComponent } from '../../components/common/close-slider.component';
 import { ConditionComponent } from '../../components/workflow/condition.component';
 import { CronComponent } from '../../components/workflow/cron.component';
+import { EmailComponent } from '../../components/workflow/email.component';
 
 /**
  * Triggers Page
@@ -14,6 +15,7 @@ export class TriggersPage {
     readonly slider: CloseSliderComponent;
     readonly condition: ConditionComponent;
     readonly cron: CronComponent;
+    readonly email: EmailComponent;
 
     // Trigger selection
     // NOTE: MUI useAutocomplete (AddStepSlider.tsx) gives role='listbox' to the List
@@ -46,11 +48,7 @@ export class TriggersPage {
     // Add Sample Payload button in inFlow mode (data-testid='webhook-add-sample-payload-button')
     readonly webhookAddSamplePayloadButton: Locator;
 
-    // --- Email trigger slider (emailToFlowComponent.tsx) ---
-    // 'Set email trigger' button (data-testid='email-set-trigger-button')
-    readonly emailSetTriggerButton: Locator;
-    // Payload tab (data-testid='email-payload-tab')
-    readonly emailPayloadTab: Locator;
+    // Email trigger locators are now on EmailComponent (triggers.email)
 
     // --- Plugin trigger action list (ActionsListAutocomplete.tsx) ---
     // Back arrow in plugin action list (data-testid='plugin-trigger-back-button')
@@ -65,6 +63,7 @@ export class TriggersPage {
         this.slider = new CloseSliderComponent(page);
         this.condition = new ConditionComponent(page);
         this.cron = new CronComponent(page);
+        this.email = new EmailComponent(page);
 
         // Trigger options: MUI useAutocomplete sets role='listbox' on the List wrapper
         // and role='option' on each ListItemButton via getOptionProps (AddStepSlider.tsx)
@@ -84,9 +83,7 @@ export class TriggersPage {
         this.webhookSendSampleTab = page.getByTestId('webhook-send-sample-tab');
         this.webhookAddSamplePayloadButton = page.getByTestId('webhook-add-sample-payload-button');
 
-        // Email trigger
-        this.emailSetTriggerButton = page.getByTestId('email-set-trigger-button');
-        this.emailPayloadTab = page.getByTestId('email-payload-tab');
+        // Email trigger locators are on this.email (EmailComponent)
 
         // Plugin trigger action list
         this.pluginTriggerBackButton = page.getByTestId('plugin-trigger-back-button');

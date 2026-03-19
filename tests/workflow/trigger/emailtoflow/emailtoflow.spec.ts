@@ -23,7 +23,7 @@ test.describe('Email to Flow Trigger', () => {
     async function openEmailSlider({ triggers, workflow }: any) {
         await setupEmailTrigger({ triggers, workflow });
         await workflow.inflowEmailNode.click();
-        await expect(triggers.emailPayloadTab).toBeVisible({ timeout: 10000 });
+        await expect(triggers.email.payloadTab).toBeVisible({ timeout: 10000 });
     }
 
     // Helper: set webhook first, then change to email so that
@@ -51,11 +51,9 @@ test.describe('Email to Flow Trigger', () => {
         await workflow.inflowEmailNode.click();
     }
 
-    // Helper: setupEmailViaChange + click the set button
+    // Helper: select email on new flow (auto-creates) — email node on canvas is confirmed
     async function setupEmail({ triggers, workflow }: any) {
-        await setupEmailViaChange({ triggers, workflow });
-        await expect(triggers.emailSetTriggerButton).toBeVisible();
-        await triggers.emailSetTriggerButton.click();
+        await setupEmailTrigger({ triggers, workflow });
     }
 
     // ------------------------------------------------------------------ //
@@ -65,51 +63,76 @@ test.describe('Email to Flow Trigger', () => {
         await openEmailSlider({ triggers, workflow });
 
         // Payload tab should be visible
-        await expect(triggers.emailPayloadTab).toBeVisible();
+        await expect(triggers.email.payloadTab).toBeVisible();
     });
 
+
     // ------------------------------------------------------------------ //
-    // Test 2: Email slider can be closed with the close button            //
+    // Test 3: Email slider can be closed with the cross icon              //
     // ------------------------------------------------------------------ //
-    test('email slider can be closed with close button', async ({ triggers, workflow }) => {
+    test('email slider can be closed with cross icon', async ({ triggers, workflow }) => {
         await openEmailSlider({ triggers, workflow });
 
         await triggers.slider.clickClose();
 
-        await expect(triggers.emailPayloadTab).not.toBeVisible();
+        await expect(triggers.email.payloadTab).not.toBeVisible();
     });
 
     // ------------------------------------------------------------------ //
-    // Test 3: Email slider can be closed with the back button             //
+    // Test 4: Email trigger button disabled when changing webhook → email //
     // ------------------------------------------------------------------ //
-    test('email slider can be closed with back button', async ({ triggers, workflow }) => {
-        await openEmailSlider({ triggers, workflow });
+    test('email trigger button disabled when changing webhook to email', async ({ triggers, workflow }) => {
+        // Set webhook first
+        const webhookApi = triggers.page.waitForResponse(
+            (resp: any) => resp.url().includes('/trigger') && resp.request().method() === 'POST',
+            { timeout: 30000 }
+        );
+        await triggers.selectWebhookTrigger();
+        await webhookApi;
+        await expect(workflow.inflowWebhookNode).toBeVisible({ timeout: 15000 });
 
-        await triggers.slider.clickBack();
+        // Open webhook slider from canvas and click Change
+        await workflow.inflowWebhookNode.click();
+        await expect(workflow.cronChangeButton).toBeVisible();
+        await workflow.cronChangeButton.click();
 
-        await expect(triggers.emailPayloadTab).not.toBeVisible();
+        // Email option should be visible but disabled
+        const emailOption = triggers.triggerOption.filter({ hasText: /email/i });
+        await expect(emailOption).toBeVisible();
+        await expect(emailOption).toHaveClass(/opacity-50/);
     });
 
     // ------------------------------------------------------------------ //
-    // Test 4: Set email trigger button visible when changing from webhook //
+    // Test 5: Email trigger button disabled when changing cron → email    //
     // ------------------------------------------------------------------ //
-    test('set email trigger button visible when changing from webhook', async ({ triggers, workflow }) => {
-        await setupEmailViaChange({ triggers, workflow });
+    test('email trigger button disabled when changing cron to email', async ({ triggers, workflow }) => {
+        // Set cron first
+        await triggers.selectCronTrigger();
+        await triggers.cron.fillStatement('Every day at noon');
+        await triggers.cron.cronInput.press('Tab');
+        await triggers.cron.save();
 
-        // email-set-trigger-button only appears when triggerType !== 'email'
-        await expect(triggers.emailSetTriggerButton).toBeVisible();
+        await expect(workflow.publish.goLiveButton).toBeVisible({ timeout: 20000 });
+
+        // Open cron slider from canvas and click Change
+        await expect(workflow.inflowCronNode).toBeVisible();
+        await workflow.inflowCronNode.click();
+        await expect(workflow.cronChangeButton).toBeVisible();
+        await workflow.cronChangeButton.click();
+
+        // Email option should be visible but disabled
+        const emailOption = triggers.triggerOption.filter({ hasText: /email/i });
+        await expect(emailOption).toBeVisible();
+        await expect(emailOption).toHaveClass(/opacity-50/);
     });
 
     // ------------------------------------------------------------------ //
-    // Test 5: Set email trigger button click confirms the trigger         //
+    // Test 6: Go-live button visible after email trigger auto-creation    //
     // ------------------------------------------------------------------ //
-    test('set email trigger button click confirms email trigger', async ({ triggers, workflow }) => {
-        await setupEmailViaChange({ triggers, workflow });
+    test('go-live button visible after email trigger auto-creation', async ({ triggers, workflow }) => {
+        await setupEmailTrigger({ triggers, workflow });
 
-        await expect(triggers.emailSetTriggerButton).toBeVisible();
-        await triggers.emailSetTriggerButton.click();
-
-        await expect(workflow.publish.goLiveButton).toBeVisible();
+        await expect(workflow.publish.goLiveButton).toBeVisible({ timeout: 15000 });
     });
 
     // ------------------------------------------------------------------ //
@@ -122,37 +145,46 @@ test.describe('Email to Flow Trigger', () => {
     });
 
     // ------------------------------------------------------------------ //
-    // Test 7: Change email → cron via Change button                       //
+    // Test 7: Change button visible in email slider header                //
+    // ------------------------------------------------------------------ //
+    test('change button visible in email slider header', async ({ triggers, workflow }) => {
+        await openEmailSlider({ triggers, workflow });
+
+        // Change button must be visible in the slider header
+        await expect(triggers.email.changeButton).toBeVisible();
+    });
+
+    // ------------------------------------------------------------------ //
+    // Test 8: Change email → cron via Change button                       //
     // ------------------------------------------------------------------ //
     test('change email trigger to cron via change button', async ({ triggers, workflow }) => {
-        await setupEmail({ triggers, workflow });
+        await openEmailSlider({ triggers, workflow });
 
-        // Open email slider from canvas
-        await expect(workflow.inflowEmailNode).toBeVisible();
-        await workflow.inflowEmailNode.click();
-
-        await expect(workflow.cronChangeButton).toBeVisible();
-        await workflow.cronChangeButton.click();
+        await expect(triggers.email.changeButton).toBeVisible();
+        await triggers.email.changeButton.click();
 
         // Select cron
         await triggers.selectCronTrigger();
 
         // Cron slider opens with statement input
         await expect(triggers.cron.cronInput).toBeVisible();
+
+        // Set cron
+        await triggers.cron.fillStatement('Every day at noon');
+        await triggers.cron.cronInput.press('Tab');
+        await triggers.cron.save();
+
+        await expect(workflow.publish.goLiveButton).toBeVisible({ timeout: 20000 });
     });
 
     // ------------------------------------------------------------------ //
-    // Test 8: Change email → webhook via Change button                    //
+    // Test 9: Change email → webhook via Change button                    //
     // ------------------------------------------------------------------ //
     test('change email trigger to webhook via change button', async ({ triggers, workflow }) => {
-        await setupEmail({ triggers, workflow });
+        await openEmailSlider({ triggers, workflow });
 
-        // Open email slider from canvas
-        await expect(workflow.inflowEmailNode).toBeVisible();
-        await workflow.inflowEmailNode.click();
-
-        await expect(workflow.cronChangeButton).toBeVisible();
-        await workflow.cronChangeButton.click();
+        await expect(triggers.email.changeButton).toBeVisible();
+        await triggers.email.changeButton.click();
 
         // Select webhook then confirm
         await triggers.selectWebhookTrigger();
@@ -163,17 +195,46 @@ test.describe('Email to Flow Trigger', () => {
     });
 
     // ------------------------------------------------------------------ //
-    // Test 9: Change button visible in email slider header                //
+    // Test 10: Help button click opens help page                          //
     // ------------------------------------------------------------------ //
-    test('change button visible in email slider header', async ({ triggers, workflow }) => {
-        await setupEmail({ triggers, workflow });
+    test('help button click opens help page', async ({ triggers, workflow }) => {
+        await openEmailSlider({ triggers, workflow });
 
-        // Open email slider from canvas
-        await expect(workflow.inflowEmailNode).toBeVisible();
-        await workflow.inflowEmailNode.click();
+        // Listen for new tab/popup opened by window.open
+        const [popup] = await Promise.all([
+            triggers.page.waitForEvent('popup'),
+            triggers.email.helpButton.click(),
+        ]);
 
-        // Change button from WhenStepNameComponent
-        await expect(workflow.cronChangeButton).toBeVisible();
+        await popup.waitForLoadState();
+        expect(popup.url()).toContain('http');
     });
 
+    // ------------------------------------------------------------------ //
+    // Test 11: Copy button is visible and works in slider                 //
+    // ------------------------------------------------------------------ //
+    test('copy button works in email slider', async ({ triggers, workflow }) => {
+        await openEmailSlider({ triggers, workflow });
+
+        await expect(triggers.email.copyButton).toBeVisible();
+        await triggers.email.copyButton.click();
+    });
+
+    // ------------------------------------------------------------------ //
+    // Test 12: Note should be visible in email slider                     //
+    // ------------------------------------------------------------------ //
+    test('note is visible in email slider', async ({ triggers, workflow }) => {
+        await openEmailSlider({ triggers, workflow });
+
+        await expect(triggers.email.noteCard).toBeVisible();
+    });
+
+    // ------------------------------------------------------------------ //
+    // Test 13: Loader visible when no data in payload                     //
+    // ------------------------------------------------------------------ //
+    test('loader visible when no payload data', async ({ triggers, workflow }) => {
+        await openEmailSlider({ triggers, workflow });
+
+        await expect(triggers.email.dataLoader).toBeVisible();
+    });
 });
