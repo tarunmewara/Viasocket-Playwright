@@ -17,10 +17,6 @@ jobs:
     timeout-minutes: 30
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: Viasocket-Playwright
-
     steps:
       - uses: actions/checkout@v4
 
@@ -36,21 +32,19 @@ jobs:
 
       - name: Create .env file
         run: |
-          cat <<EOF > .env
-          PROXY_TOKEN=${{ secrets.PROXY_TOKEN }}
-          ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }}
-          AUTH_TOKEN=${{ secrets.AUTH_TOKEN }}
-          AUTH_COOKIE_NAME=${{ secrets.AUTH_COOKIE_NAME }}
-          AUTH_EXPIRE_AT=${{ secrets.AUTH_EXPIRE_AT }}
-          AUTH_USER_REF_ID=${{ secrets.AUTH_USER_REF_ID }}
-          AUTH_COMPANY_REF_ID=${{ secrets.AUTH_COMPANY_REF_ID }}
-          ORG_ID=${{ secrets.ORG_ID }}
-          BASE_URL=${{ secrets.BASE_URL }}
-          STORAGE_STATE=playwright/.auth/user.json
-          COOKIE_DOMAIN=${{ secrets.COOKIE_DOMAIN }}
-          PROJECT_ID=${{ secrets.PROJECT_ID }}
-          WORKSPACE_NAME=${{ secrets.WORKSPACE_NAME }}
-          EOF
+          echo "PROXY_TOKEN=${{ secrets.PROXY_TOKEN }}" >> .env
+          echo "ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }}" >> .env
+          echo "AUTH_TOKEN=${{ secrets.AUTH_TOKEN }}" >> .env
+          echo "AUTH_COOKIE_NAME=${{ secrets.AUTH_COOKIE_NAME }}" >> .env
+          echo "AUTH_EXPIRE_AT=${{ secrets.AUTH_EXPIRE_AT }}" >> .env
+          echo "AUTH_USER_REF_ID=${{ secrets.AUTH_USER_REF_ID }}" >> .env
+          echo "AUTH_COMPANY_REF_ID=${{ secrets.AUTH_COMPANY_REF_ID }}" >> .env
+          echo "ORG_ID=${{ secrets.ORG_ID }}" >> .env
+          echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env
+          echo "STORAGE_STATE=playwright/.auth/user.json" >> .env
+          echo "COOKIE_DOMAIN=${{ secrets.COOKIE_DOMAIN }}" >> .env
+          echo "PROJECT_ID=${{ secrets.PROJECT_ID }}" >> .env
+          echo "WORKSPACE_NAME=${{ secrets.WORKSPACE_NAME }}" >> .env
 
       - name: Run Playwright tests
         run: npx playwright test
@@ -59,14 +53,14 @@ jobs:
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
-          path: Viasocket-Playwright/playwright-report/
+          path: playwright-report/
           retention-days: 30
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: test-results
-          path: Viasocket-Playwright/test-results/
+          path: test-results/
           retention-days: 30
 
   deploy-report:
