@@ -16,7 +16,6 @@ jobs:
   test:
     timeout-minutes: 30
     runs-on: ubuntu-latest
-    environment: BASE_URL-https://dev-flow.viasocket.com
 
     steps:
       - uses: actions/checkout@v4
