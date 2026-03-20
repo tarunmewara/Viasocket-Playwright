@@ -16,6 +16,7 @@ jobs:
   test:
     timeout-minutes: 30
     runs-on: ubuntu-latest
+    environment: BASE_URL-https://dev-flow.viasocket.com
 
     steps:
       - uses: actions/checkout@v4
@@ -45,6 +46,16 @@ jobs:
           echo "COOKIE_DOMAIN=${{ secrets.COOKIE_DOMAIN }}" >> .env
           echo "PROJECT_ID=${{ secrets.PROJECT_ID }}" >> .env
           echo "WORKSPACE_NAME=${{ secrets.WORKSPACE_NAME }}" >> .env
+
+      - name: Debug .env file
+        run: |
+          echo "=== .env line count ==="
+          wc -l .env
+          echo "=== Keys in .env ==="
+          cut -d'=' -f1 .env
+          echo "=== Check AUTH_TOKEN length ==="
+          echo "AUTH_TOKEN length: $(grep '^AUTH_TOKEN=' .env | cut -d'=' -f2 | wc -c)"
+          echo "BASE_URL length: $(grep '^BASE_URL=' .env | cut -d'=' -f2 | wc -c)"
 
       - name: Run Playwright tests
         run: npx playwright test
