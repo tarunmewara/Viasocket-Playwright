@@ -4,6 +4,7 @@ import { GoLiveConfirmModal } from '../../modals/go-live-confirm.modal';
 import { FeedbackModal } from '../../modals/feedback.modal';
 import { JSCodeComponent } from '../../components/workflow/js-code.component';
 import { HttpApiRequestComponent } from '../../components/workflow/http-api-request.component';
+import { MultipathComponent } from '../../components/workflow/multipath.component';
 
 /**
  * Workflow Page
@@ -19,6 +20,7 @@ export class WorkflowPage {
     readonly feedback: FeedbackModal;
     readonly jscode: JSCodeComponent;
     readonly httpApi: HttpApiRequestComponent;
+    readonly multipath: MultipathComponent;
 
     // Page-unique locators
     readonly flowTitleInput: Locator;
@@ -91,6 +93,7 @@ export class WorkflowPage {
         this.feedback = new FeedbackModal(page);
         this.jscode = new JSCodeComponent(page);
         this.httpApi = new HttpApiRequestComponent(page);
+        this.multipath = new MultipathComponent(page);
 
         // Page-unique locators
         this.flowTitleInput = page.locator('#flow-title-textfield');
