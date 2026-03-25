@@ -5,6 +5,7 @@ import { FeedbackModal } from '../../modals/feedback.modal';
 import { JSCodeComponent } from '../../components/workflow/js-code.component';
 import { HttpApiRequestComponent } from '../../components/workflow/http-api-request.component';
 import { MultipathComponent } from '../../components/workflow/multipath.component';
+import { DelayComponent } from '../../components/workflow/delay.component';
 
 /**
  * Workflow Page
@@ -21,6 +22,7 @@ export class WorkflowPage {
     readonly jscode: JSCodeComponent;
     readonly httpApi: HttpApiRequestComponent;
     readonly multipath: MultipathComponent;
+    readonly delay: DelayComponent;
 
     // Page-unique locators
     readonly flowTitleInput: Locator;
@@ -94,6 +96,7 @@ export class WorkflowPage {
         this.jscode = new JSCodeComponent(page);
         this.httpApi = new HttpApiRequestComponent(page);
         this.multipath = new MultipathComponent(page);
+        this.delay = new DelayComponent(page);
 
         // Page-unique locators
         this.flowTitleInput = page.locator('#flow-title-textfield');
