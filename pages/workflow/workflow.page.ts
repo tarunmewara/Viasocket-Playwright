@@ -4,6 +4,7 @@ import { GoLiveConfirmModal } from '../../modals/go-live-confirm.modal';
 import { FeedbackModal } from '../../modals/feedback.modal';
 import { JSCodeComponent } from '../../components/workflow/js-code.component';
 import { HttpApiRequestComponent } from '../../components/workflow/http-api-request.component';
+import { AskAIModal } from '../../modals/ask-ai.modal';
 import { MultipathComponent } from '../../components/workflow/multipath.component';
 import { DelayComponent } from '../../components/workflow/delay.component';
 
@@ -21,6 +22,7 @@ export class WorkflowPage {
     readonly feedback: FeedbackModal;
     readonly jscode: JSCodeComponent;
     readonly httpApi: HttpApiRequestComponent;
+    readonly askAI: AskAIModal;
     readonly multipath: MultipathComponent;
     readonly delay: DelayComponent;
 
@@ -95,6 +97,7 @@ export class WorkflowPage {
         this.feedback = new FeedbackModal(page);
         this.jscode = new JSCodeComponent(page);
         this.httpApi = new HttpApiRequestComponent(page);
+        this.askAI = new AskAIModal(page);
         this.multipath = new MultipathComponent(page);
         this.delay = new DelayComponent(page);
 

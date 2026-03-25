@@ -85,6 +85,15 @@ export class HttpApiRequestComponent {
     // ── Step change button (data-testid) ─────────────────────────────────────
     readonly stepChangeButton: Locator;
 
+    // ── Delete row buttons (MUI Delete icon inside IconButton) ────────────────
+    readonly deleteRowButtons: Locator;
+
+    // ── Radio group (body type) ──────────────────────────────────────────────
+    readonly bodyRadioGroup: Locator;
+
+    // ── Field mapping chip buttons ───────────────────────────────────────────
+    readonly fieldMappingButtons: Locator;
+
     // ── Canvas step nodes ──────────────────────────────────────────────────────
     readonly httpApiStepNode: Locator;
     readonly configureStepNode: Locator;
@@ -102,8 +111,8 @@ export class HttpApiRequestComponent {
         this.curlAccordionBtn = page.locator('#accordion-summary-curl');
         this.inputValuesAccordionBtn = page.locator('button').filter({ hasText: 'Input Values' });
 
-        // Method dropdown — MUI Select rendered as combobox
-        this.methodDropdown = page.getByRole('combobox', { name: 'Without label' });
+        // Method dropdown — CSS selector avoids aria-hidden breakage from MUI Popover
+        this.methodDropdown = page.locator('[role="combobox"][aria-label="Without label"]').first();
 
         // URL input — textbox with API placeholder
         this.urlInput = page.getByPlaceholder('https://flow.viasocket.com/');
@@ -131,7 +140,7 @@ export class HttpApiRequestComponent {
 
         // cURL section
         this.curlTextbox = page.getByPlaceholder(/Provide cURL command/);
-        this.curlApplyButton = page.getByRole('button', { name: 'Apply' });
+        this.curlApplyButton = page.locator('button').filter({ hasText: /^Apply$/ });
 
         // API name & panel header
         this.apiNameInput = page.getByPlaceholder('Api Name');
@@ -167,6 +176,15 @@ export class HttpApiRequestComponent {
 
         // Step change button
         this.stepChangeButton = page.getByTestId('step-change-button');
+
+        // Delete row buttons — scoped to the small icon buttons next to key-value pairs
+        this.deleteRowButtons = page.locator('[data-testid="DeleteIcon"]');
+
+        // Radio group (body type)
+        this.bodyRadioGroup = page.getByRole('radiogroup');
+
+        // Field mapping chip buttons
+        this.fieldMappingButtons = page.getByRole('button', { name: 'Click for Field Mapping' });
 
         // Canvas step nodes
         this.httpApiStepNode = page.getByText('HTTP_API_Request');
@@ -315,6 +333,35 @@ export class HttpApiRequestComponent {
         await this.page.keyboard.type(text);
     }
 
+    async applyCurlCommand(text: string): Promise<void> {
+        await this.curlTextbox.click();
+        await this.page.keyboard.type(text);
+        await this.page.waitForTimeout(300);
+        // JS click on Apply bypasses any overlay
+        await this.curlApplyButton.evaluate((el) => (el as HTMLElement).click());
+        await this.page.waitForTimeout(2000);
+        // Aggressively dismiss all overlays via raw DOM
+        await this.page.evaluate(() => {
+            // Close Available Variables panel
+            document.querySelectorAll('p').forEach((p) => {
+                if (p.textContent?.includes('Available Variables')) {
+                    const btn = p.parentElement?.querySelector('button');
+                    if (btn) (btn as HTMLElement).click();
+                }
+            });
+            // Close Flow Document popover — find Close button by sibling iframe
+            document.querySelectorAll('iframe').forEach((iframe) => {
+                const container = iframe.parentElement;
+                if (container) {
+                    container.querySelectorAll('button').forEach((btn) => {
+                        if (btn.textContent?.includes('Close')) (btn as HTMLElement).click();
+                    });
+                }
+            });
+        });
+        await this.page.waitForTimeout(500);
+    }
+
     // ── URL clearing ──────────────────────────────────────────────────────────
 
     async clearUrl(): Promise<void> {
@@ -328,5 +375,86 @@ export class HttpApiRequestComponent {
     async fillApiName(name: string): Promise<void> {
         await this.apiNameInput.click();
         await this.apiNameInput.fill(name);
+    }
+
+    // ── Query params bulk typing ─────────────────────────────────────────────
+
+    async typeQueryParamsBulk(text: string): Promise<void> {
+        await this.queryParamsBulkTextbox.click();
+        await this.page.keyboard.type(text);
+        await this.queryParamsLabel.click({ force: true });
+        await this.page.waitForTimeout(300);
+    }
+
+    // ── Headers bulk typing ──────────────────────────────────────────────────
+
+    async typeHeadersBulk(text: string): Promise<void> {
+        await this.headersBulkTextbox.click();
+        await this.page.keyboard.type(text);
+        await this.headersLabel.click({ force: true });
+        await this.page.waitForTimeout(300);
+    }
+
+    // ── Form key-value interactions ──────────────────────────────────────────
+
+    formKeyInput(index: number): Locator {
+        return this.page.getByPlaceholder(`key ${index}`);
+    }
+
+    formValueInput(index: number): Locator {
+        return this.page.getByPlaceholder(`value ${index}`);
+    }
+
+    async typeFormKey(index: number, text: string): Promise<void> {
+        await this.formKeyInput(index).click();
+        await this.page.keyboard.type(text);
+        await this.queryParamsLabel.click({ force: true });
+        await this.page.waitForTimeout(300);
+    }
+
+    async typeFormValue(index: number, text: string): Promise<void> {
+        await this.formValueInput(index).click({ force: true });
+        await this.page.keyboard.type(text);
+        await this.queryParamsLabel.click({ force: true });
+        await this.page.waitForTimeout(300);
+    }
+
+    async clickAddRow(): Promise<void> {
+        await this.addRowButton.click({ force: true });
+    }
+
+    async clickDeleteRow(index: number): Promise<void> {
+        await this.deleteRowButtons.nth(index).click({ force: true });
+        await this.page.waitForTimeout(300);
+    }
+
+    async getDeleteRowCount(): Promise<number> {
+        return await this.deleteRowButtons.count();
+    }
+
+    // ── Raw body type dropdown ───────────────────────────────────────────────
+
+    getRawBodyTypeDropdown(): Locator {
+        // Second combobox in API Editor region (first is method dropdown)
+        return this.page.getByRole('combobox', { name: 'Without label' }).nth(1);
+    }
+
+    async selectRawBodyType(type: string): Promise<void> {
+        await this.getRawBodyTypeDropdown().click();
+        await this.page.getByRole('option', { name: type }).click();
+    }
+
+    async getRawBodyTypeValue(): Promise<string> {
+        return (await this.getRawBodyTypeDropdown().textContent()) ?? '';
+    }
+
+    // ── Bulk textbox content retrieval ────────────────────────────────────────
+
+    async getQueryParamsBulkValue(): Promise<string> {
+        return (await this.queryParamsBulkTextbox.textContent()) ?? '';
+    }
+
+    async getHeadersBulkValue(): Promise<string> {
+        return (await this.headersBulkTextbox.textContent()) ?? '';
     }
 }
