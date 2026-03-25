@@ -123,6 +123,62 @@ export class TriggersPage {
         await this.triggerOption.filter({ hasText: text }).click();
     }
 
+    async searchTrigger(text: string): Promise<void> {
+        await this.triggerSearchInput.click();
+        await this.triggerSearchInput.clear();
+        await this.triggerSearchInput.pressSequentially(text);
+    }
+
+    pluginOptionByName(name: string): Locator {
+        return this.page.getByRole('option').filter({ hasText: new RegExp(name, 'i') }).first();
+    }
+
+    emailTriggerOption(): Locator {
+        return this.triggerOption.filter({ hasText: /email/i }).first();
+    }
+
+    async selectPluginTrigger(name: string): Promise<void> {
+        await this.searchTrigger(name);
+        await this.pluginOptionByName(name).waitFor({ state: 'visible' });
+        await this.pluginOptionByName(name).click();
+    }
+
+    async selectFirstPluginAction(): Promise<void> {
+        await this.triggerActionItem.first().click();
+    }
+
+    async setPluginTriggerByName(name: string): Promise<void> {
+        await this.selectPluginTrigger(name);
+        await this.selectFirstPluginAction();
+    }
+
+    async searchPluginAction(text: string): Promise<void> {
+        await this.actionSearchInput.click();
+        await this.actionSearchInput.clear();
+        await this.actionSearchInput.pressSequentially(text);
+    }
+
+    async goBackFromPluginActions(): Promise<void> {
+        await this.pluginTriggerBackButton.click();
+    }
+
+    async clickPreIfConditionButton(): Promise<void> {
+        await this.cron.cronRunIfConditionButton.click();
+    }
+
+    async confirmEmailTrigger(): Promise<void> {
+        await this.email.setTriggerButton.click();
+    }
+
+    async isPreIfConditionVisible(): Promise<boolean> {
+        return this.cron.cronRunIfConditionButton.isVisible();
+    }
+
+    async setPreIfCondition(): Promise<void> {
+        await this.clickPreIfConditionButton();
+        await this.addCondition();
+    }
+
     // --- Condition ---
 
     async addCondition(): Promise<void> {

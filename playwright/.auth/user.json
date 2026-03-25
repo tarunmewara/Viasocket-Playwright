@@ -1,18 +1,6 @@
 {
   "cookies": [
     {
-      "name": "cf_clearance",
-      "value": "gIn0BwWcLA.xgCA9qK5jPKGbDKcKkuY0XtO7qW4w_ms-1773904569-1.2.1.1-ONmTbwylBMqF.1XpWcO0pIPYaNFq2fqsZuEr5IhyhMS7Dxyba_7Jr1sI9hQMOAeI6X4Ey3k9PDPKqceZ0Ss6Z6DqyHOMNpb2i8uuBgk.0X.c4k5Wr_e7zJYDSDfpYYHUM6g0dXagQKgbPU0gTGYzGeGxuSpTriUFpw1f2BMZ4V5mzW.T3FCOdNtIN9RY6sz9YtAQF4JdBOj07wKDsMAJWugc.t.8wGLrSJ46JDNIpd8",
-      "domain": ".viasocket.com",
-      "path": "/",
-      "expires": 1805440569.26051,
-      "httpOnly": true,
-      "secure": true,
-      "sameSite": "None",
-      "partitionKey": "https://viasocket.com",
-      "_crHasCrossSiteAncestor": false
-    },
-    {
       "name": "_gcl_au",
       "value": "1.1.1979350566.1773904570",
       "domain": ".viasocket.com",
@@ -125,66 +113,6 @@
       "_crHasCrossSiteAncestor": true
     },
     {
-      "name": "testing",
-      "value": "ckVCUVpjTWQvZHF3UWlTeWN0ZlhUQW9pbXZmY0p1eXZNWHQxUmZablZuckJKWnd4RHAwZUl4cno1MG56alErUVlsVVhZdlh4c3FUNjRkeGpNcElMVkF5ODVRZ2tHVmw0dGxTQ2c4MllDRzlabnU1N0YrcktXNnNJekZwUERxNUZyZkJpd0FqVmZCWmoyU3pIVWE2NFdaSzN4Q0p1bzYzVkJNT0tEODBTQ2FiMmdJRHF6bnZHS2laQktLM0RRcjFs",
-      "domain": ".viasocket.com",
-      "path": "/",
-      "expires": 1774077431,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "token_type",
-      "value": "Token",
-      "domain": ".viasocket.com",
-      "path": "/",
-      "expires": 1774077431,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "expire_at",
-      "value": "1774163830",
-      "domain": ".viasocket.com",
-      "path": "/",
-      "expires": 1774077431,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "user_ref_id",
-      "value": "89312",
-      "domain": ".viasocket.com",
-      "path": "/",
-      "expires": 1774077431,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "company_ref_id",
-      "value": "58104",
-      "domain": ".viasocket.com",
-      "path": "/",
-      "expires": 1774077431,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "is_new_user",
-      "value": "0",
-      "domain": ".viasocket.com",
-      "path": "/",
-      "expires": 1774077431,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
       "name": "IDE",
       "value": "AHWqTUkCzSeHkRsDz9qpRGCHds3QaRZwi5PyXKxdqM5gfJfQxED1n8CbnoF3BjkH",
       "domain": ".doubleclick.net",
@@ -225,16 +153,6 @@
       "sameSite": "Strict"
     },
     {
-      "name": "_clsk",
-      "value": "1yhvfjg%5E1773904713113%5E10%5E1%5Ef.clarity.ms%2Fcollect",
-      "domain": ".viasocket.com",
-      "path": "/",
-      "expires": 1773991113,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
       "name": "_ga_K5XJYDTTGH",
       "value": "GS2.1.s1773904570$o1$g1$t1773904713$j42$l0$h0",
       "domain": ".viasocket.com",
@@ -253,6 +171,38 @@
       "httpOnly": false,
       "secure": false,
       "sameSite": "Lax"
+    },
+    {
+      "name": "testing",
+      "value": "bXU3Z3FIQllwekRUejNoUHpJVzZJYlFwaHhNangzUlc3MmtMLzBzUWQ4Y2c5VG5XTWx0M1ZScytNb1ExRVVCektKQmxlOXhtMU9ta1hmT1FtUm02cnZDNm1Cczd4TWJqdjI5eVVYc2tiWWk0dFpmUy9LeGEyeTFWSkJmNlB5OC9VMmM0d1FobEFQVFEwREg0L3FLYTdFMVBwQ3VzMHl0ekRadTNJdXQ0ZFJFT1psdFJIMUhNd2tOcFlEeDBKRW1X",
+      "domain": ".viasocket.com",
+      "path": "/",
+      "expires": 1774600008,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "token_type",
+      "value": "Token",
+      "domain": ".viasocket.com",
+      "path": "/",
+      "expires": 1774600008,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "cf_clearance",
+      "value": "6LpP143zR1X51YKyWxwkhtfzH3YGm9bhb5Xkb6hJpHM-1774427210-1.2.1.1-TH7Vp6jZuD_ZGRqNlfO1qQw8YTCOqmJAPk01Ffz9AYelpZwyyy.MjFL.ifI7EdMlPaSBpCz2uYIKbpZr9vdY8A5Ia3m4HLIwsNEArgqWf7gTqz5wzpy3bFQhAz5HqxANNxtmXg8Br0qpQ7A8yhQ8ZGwtUcqILqh1eb7CymcpBt4noTSrUaoVTX9m59p8lIxSYfc5u4s0lsxCBInOO4m2ztGBonKhZ6NzmGogtZQeNuw",
+      "domain": ".viasocket.com",
+      "path": "/",
+      "expires": 1805963211.38189,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None",
+      "partitionKey": "https://viasocket.com",
+      "_crHasCrossSiteAncestor": false
     }
   ],
   "origins": [
@@ -268,12 +218,12 @@
           "value": "{\"schema\":\"gcl\",\"version\":1,\"gcl_ctr\":{\"value\":{\"value\":0,\"timeouts\":0,\"errors\":0,\"creationTimeMs\":1773904570399},\"expires\":1781680570399}}"
         },
         {
-          "name": "_zaraz_userFullName",
-          "value": "\"suraj choudhary\""
-        },
-        {
           "name": "_zaraz_userId",
           "value": "89312"
+        },
+        {
+          "name": "_zaraz_userFullName",
+          "value": "\"suraj choudhary\""
         },
         {
           "name": "_zaraz_userEmail",
@@ -292,16 +242,16 @@
           "value": "{\"value\":{\"notification_url\":\"https://api.cobrowse.io\",\"notification_token\":\"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjBkOWM2Nzk1YzQ4MiJ9.eyJhdWQiOiJjb2Jyb3dzZS5pby9zb2NrZXRzIiwiY2hhbm5lbCI6Ii9hcGkvMS9hY2NvdW50cy81ZjNkNWEzNGM5OGVhMzgxOGQyMDkzZGUvZGV2aWNlcy8zYjMzMzUwOC00NmRhLTQ4MjQtYjA5MC0yODEyMzY4OTE3YTkiLCJpYXQiOjE3NzM5MDQ2MzksImV4cCI6MTc3NDc2ODYzOSwiaXNzIjoiY29icm93c2UuaW8ifQ.jkVdtO81VH9q8wswUdVSdflxnZzsxUSQ7YuEPxmIIYP94tquwGKZEp-dxJmHIEJPaT5sHN3LsLeXypDJf9diiSKUuR_hqqJSjpa_DhWaJz8oKvD_O4jgwAJzH274xwHBYfg1e3gO1G79K7hBiOU2enG9ZO7G8qn-ha5ZHob-0hrV8ojwarYtAas-OxoBG-qejyxE4dXdwzoNgKpSkgb0tsEBGjrZ9KJiYj_cI9BfW-vGjizYag1RIzMqSxHuryFFnZOo3gjPF8Vi-k_P2_IKh5SlaEaugPCOHJx-S8cXRuOS8YfAKPJGvNGtp2BWmCludMy30Iv2BVTUJ-z5XYmHow\",\"custom_data\":{\"device_id\":\"6968d541f3f4d379d682294b\"},\"next_registration_time\":1773983905124},\"group\":\"FZBGaF9-Od0GEQ:https://api.cobrowse.io\"}"
         },
         {
+          "name": "_zaraz_zipyEnabled",
+          "value": "false"
+        },
+        {
           "name": "hello-widget-uuid",
           "value": "6968d541f3f4d379d682294b"
         },
         {
           "name": "ph_phc_NkBGL0NWM8IYpcQ2Rgex6d2qwQGTaRx7ZUeACTDmO25_posthog",
           "value": "{\"$device_id\":\"019d04f3-ba9b-7255-91a7-3bfd880e1df7\",\"distinct_id\":\"89312\",\"$user_state\":\"identified\",\"$initialization_time\":\"2026-03-19T07:17:16.749Z\",\"$configured_session_timeout_ms\":1800000,\"$error_tracking_suppression_rules\":[],\"$session_recording_remote_config\":{\"cache_timestamp\":1773904636767,\"enabled\":false,\"networkPayloadCapture\":{\"capturePerformance\":{\"network_timing\":true,\"web_vitals\":false,\"web_vitals_allowed_metrics\":null}},\"canvasRecording\":{},\"sampleRate\":null,\"minimumDurationMilliseconds\":null},\"$autocapture_disabled_server_side\":false,\"$product_tours_enabled_server_side\":false,\"$heatmaps_enabled_server_side\":false,\"$web_vitals_enabled_server_side\":false,\"$web_vitals_allowed_metrics\":null,\"$exception_capture_enabled_server_side\":false,\"$dead_clicks_enabled_server_side\":false,\"$epp\":true,\"$user_id\":\"89312\",\"$stored_person_properties\":{\"email\":\"sc@viasocket.com\",\"name\":\"suraj choudhary\"},\"$feature_flag_errors\":[],\"$active_feature_flags\":[],\"$enabled_feature_flags\":{},\"$feature_flag_payloads\":{},\"$feature_flag_details\":{},\"$feature_flag_request_id\":\"152f4a06-6026-4661-b0a9-681312c7005f\",\"$feature_flag_evaluated_at\":1773908929533}"
-        },
-        {
-          "name": "_zaraz_zipyEnabled",
-          "value": "false"
         },
         {
           "name": "lastOrgId",

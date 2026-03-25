@@ -222,6 +222,14 @@ export class WorkflowPage {
         await this.singleStepConfigureButton.click();
     }
 
+    async clickTriggerChangeButton(): Promise<void> {
+        await this.cronChangeButton.click();
+    }
+
+    async confirmWebhookTrigger(): Promise<void> {
+        await this.setWebhookButton.click();
+    }
+
     // --- Flow title ---
 
     async setFlowTitle(title: string): Promise<void> {
