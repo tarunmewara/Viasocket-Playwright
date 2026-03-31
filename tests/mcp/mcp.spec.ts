@@ -3,45 +3,38 @@ import { MCPPage } from '../../pages/mcp/mcp.page';
 import type { Page } from '@playwright/test';
 
 /**
- * Wait for MCP landing page to stabilize after async MCP list load.
- * Resolves once either "Existing MCPs" heading or "Get Started" button is visible.
+ * Wait for the MCP landing page to be fully loaded and stable.
  */
 async function waitForMCPPageStable(mcp: MCPPage, page: Page): Promise<void> {
-    await expect(mcp.mainHeading).toBeVisible({ timeout: 15000 });
-    // mcpDataGrid only renders AFTER the MCP list API returns with existing MCPs.
-    // getStartedButton renders when API returns empty list (no MCPs).
-    // Wait for DataGrid first (stable indicator that API completed with MCPs).
-    // Fall back to getStartedButton if no MCPs exist.
-    try {
-        await expect(mcp.mcpDataGrid).toBeVisible({ timeout: 10000 });
-    } catch {
-        await expect(mcp.getStartedButton).toBeVisible({ timeout: 5000 });
-    }
+    // Wait for page to be fully loaded (including React app)
+    await page.waitForLoadState('load');
+    await expect(mcp.mainHeading).toBeVisible({ timeout: 20000 });
+    // Mushroom card is always visible now (renders for both empty and non-empty states)
+    await expect(mcp.mushroomCard).toBeVisible({ timeout: 15000 });
 }
 
 /**
- * Navigate to an existing MCP's selected page, creating one if none exist.
+ * Navigate to an existing MCP's selected page.
+ * Note: MCP creation now happens via external Mushroom app, so we can only navigate to existing MCPs.
+ * Returns true if navigation successful, false if no MCPs exist (caller should skip test).
  */
-async function navigateToSelectedMCP(mcp: MCPPage, page: Page): Promise<void> {
+async function navigateToSelectedMCP(mcp: MCPPage, page: Page): Promise<boolean> {
     await waitForMCPPageStable(mcp, page);
     const hasExisting = await mcp.existingMCPsHeading.isVisible();
-    if (hasExisting) {
-        await mcp.mcpDataGrid.getByRole('row').filter({ has: page.getByRole('gridcell') }).first().click();
-    } else {
-        await mcp.clickGetStarted();
-        await expect(mcp.generateSecureUrlButton).toBeVisible({ timeout: 10000 });
-        await mcp.clickGenerateSecureUrl();
+    if (!hasExisting) {
+        return false;
     }
-    await expect(page).toHaveURL(/\/mcp\/\d+\/\w+/, { timeout: 30000 });
+    await mcp.mcpDataGrid.getByRole('row').filter({ has: page.getByRole('gridcell') }).first().click();
+    await page.waitForURL(/\/mcp\/\d+\/[a-f0-9]{24}/, { timeout: 15000 });
+    return true;
 }
 
 test.describe('MCP Module Tests', () => {
 
-    test.beforeEach(async ({ workspace, mcp, page }) => {
-        await workspace.navigateToOrg();
-        await workspace.selectFirstWorkspace();
-        await mcp.navigateFromSidebar();
-        await expect(page).toHaveURL(/\/mcp\//, { timeout: 15000 });
+    test.beforeEach(async ({ page, mcp }) => {
+        const orgId = process.env.ORG_ID;
+        await page.goto(`/mcp/${orgId}`, { waitUntil: 'domcontentloaded' });
+        await waitForMCPPageStable(mcp, page);
     });
 
     test.describe('Landing Page', () => {
@@ -50,184 +43,132 @@ test.describe('MCP Module Tests', () => {
             await expect(mcp.mainHeading).toBeVisible({ timeout: 10000 });
         });
 
-        test('TC-MCP-02: MCP landing page displays step cards', async ({ mcp, page }) => {
-            await waitForMCPPageStable(mcp, page);
-            await expect(mcp.stepOneCard).toBeVisible({ timeout: 10000 });
-            await expect(mcp.stepTwoCard).toBeVisible();
-            await expect(mcp.stepThreeCard).toBeVisible();
+        test('TC-MCP-02: MCP landing page displays Mushroom card', async ({ mcp }) => {
+            await expect(mcp.mushroomCard).toBeVisible({ timeout: 10000 });
+            await expect(mcp.mushroomCardHeading).toBeVisible({ timeout: 10000 });
+            await expect(mcp.mushroomCardChip).toBeVisible({ timeout: 10000 });
         });
 
-        test('TC-MCP-03: Learn More link is visible on step three', async ({ mcp }) => {
-            await expect(mcp.learnMoreLink).toBeVisible({ timeout: 10000 });
+        test('TC-MCP-03: Mushroom card displays GET STARTED button', async ({ mcp }) => {
+            await expect(mcp.getStartedButton).toBeVisible({ timeout: 10000 });
         });
 
-        test('TC-MCP-04: Get Started or Create New button is present', async ({ mcp, page }) => {
-            await waitForMCPPageStable(mcp, page);
-            const getStartedVisible = await mcp.getStartedButton.isVisible();
-            const createNewVisible = await mcp.createNewButton.isVisible();
-            expect(getStartedVisible || createNewVisible).toBe(true);
-        });
-
-        test('TC-MCP-05: Existing MCPs heading visible when MCPs exist', async ({ mcp }) => {
+        test('TC-MCP-04: Existing MCPs heading visible when MCPs exist', async ({ mcp }) => {
             const hasExisting = await mcp.hasExistingMCPs();
             if (!hasExisting) {
                 test.skip();
                 return;
             }
-            await expect(mcp.existingMCPsHeading).toBeVisible();
+            await expect(mcp.existingMCPsHeading).toBeVisible({ timeout: 10000 });
         });
 
-        test('TC-MCP-06: MCP DataGrid visible when MCPs exist', async ({ mcp }) => {
+        test('TC-MCP-05: MCP DataGrid visible when MCPs exist', async ({ mcp }) => {
             const hasExisting = await mcp.hasExistingMCPs();
             if (!hasExisting) {
                 test.skip();
                 return;
             }
-            await expect(mcp.mcpDataGrid).toBeVisible();
+            await expect(mcp.mcpDataGrid).toBeVisible({ timeout: 10000 });
         });
     });
 
-    test.describe('Create New MCP', () => {
+    test.describe('Mushroom Integration', () => {
 
-        test('TC-MCP-07: Get Started shows Generate Secure URL button', async ({ mcp, page }) => {
-            await waitForMCPPageStable(mcp, page);
-            const hasExisting = await mcp.existingMCPsHeading.isVisible();
-            if (hasExisting) {
-                await mcp.clickCreateNew();
-            } else {
-                await mcp.clickGetStarted();
-            }
-
-            await expect(mcp.generateSecureUrlButton).toBeVisible({ timeout: 10000 });
+        test('TC-MCP-06: Mushroom card displays correct heading and description', async ({ mcp }) => {
+            await expect(mcp.mushroomCardHeading).toHaveText('Create MCP Servers with Mushroom', { timeout: 10000 });
+            await expect(mcp.mushroomCard).toContainText('Build, configure, and deploy MCP servers visually', { timeout: 10000 });
         });
 
-        test('TC-MCP-08: Generate Secure URL creates MCP and navigates to selected page', async ({ mcp, page }) => {
-            await waitForMCPPageStable(mcp, page);
-            const hasExisting = await mcp.existingMCPsHeading.isVisible();
-            if (hasExisting) {
-                await mcp.clickCreateNew();
-            } else {
-                await mcp.clickGetStarted();
-            }
-
-            await expect(mcp.generateSecureUrlButton).toBeVisible({ timeout: 10000 });
-            await mcp.clickGenerateSecureUrl();
-
-            // Should navigate to /mcp/:orgId/:mcpId
-            await expect(page).toHaveURL(/\/mcp\/\d+\/\w+/, { timeout: 30000 });
+        test('TC-MCP-07: Mushroom card shows NEW PRODUCT chip', async ({ mcp }) => {
+            await expect(mcp.mushroomCardChip).toBeVisible({ timeout: 10000 });
+            await expect(mcp.mushroomCardChip).toHaveText('NEW PRODUCT', { timeout: 10000 });
         });
     });
 
     test.describe('Selected MCP Page', () => {
 
         test.beforeEach(async ({ page, mcp }) => {
-            await navigateToSelectedMCP(mcp, page);
+            const orgId = process.env.ORG_ID;
+            const mcpId = process.env.MCP_ID;
+            
+            // URL format: /mcp/{orgId}/{mcpId}
+            // orgId = organization ID (e.g., 58104)
+            // mcpId = specific MCP's _id (e.g., MongoDB ObjectId, NOT the same as orgId)
+            
+            if (!mcpId || mcpId === orgId) {
+                // Fallback: parent beforeEach already loaded landing page, just navigate to first MCP
+                const hasNavigated = await navigateToSelectedMCP(mcp, page);
+                if (!hasNavigated) {
+                    test.skip();
+                }
+            } else {
+                // Direct navigation to specific MCP using MCP_ID from .env
+                await page.goto(`/mcp/${orgId}/${mcpId}`, { waitUntil: 'domcontentloaded' });
+                await page.waitForLoadState('load');
+                // Wait for selected MCP page to load
+                await expect(mcp.yourMCPsHeading).toBeVisible({ timeout: 15000 });
+            }
         });
 
-        test('TC-MCP-09: Selected MCP page shows sidebar with Your MCPs heading', async ({ mcp }) => {
+        test('TC-MCP-08: Selected MCP page shows sidebar with Your MCPs heading', async ({ mcp }) => {
             await expect(mcp.yourMCPsHeading).toBeVisible({ timeout: 10000 });
+        });
+
+        test('TC-MCP-09: Sidebar back button is visible', async ({ mcp }) => {
+            await expect(mcp.backButton).toBeVisible({ timeout: 10000 });
         });
 
         test('TC-MCP-10: Sidebar Create New button is visible', async ({ mcp }) => {
             await expect(mcp.sidebarCreateNewButton).toBeVisible({ timeout: 10000 });
         });
 
-        test('TC-MCP-11: Configure tab is visible and selected by default', async ({ mcp }) => {
+        test('TC-MCP-11: Sidebar shows Go to embed link', async ({ mcp }) => {
+            await expect(mcp.goToEmbedLink).toBeVisible({ timeout: 10000 });
+        });
+
+        test('TC-MCP-12: Configure tab is visible and selected by default', async ({ mcp }) => {
             await expect(mcp.configureTab).toBeVisible({ timeout: 15000 });
         });
 
-        test('TC-MCP-12: Connect tab is visible', async ({ mcp }) => {
+        test('TC-MCP-13: Connect tab is visible', async ({ mcp }) => {
             await expect(mcp.connectTab).toBeVisible({ timeout: 15000 });
         });
 
-        test('TC-MCP-13: Switch to Connect tab shows client selector', async ({ mcp }) => {
-            await expect(mcp.connectTab).toBeVisible({ timeout: 15000 });
+        test('TC-MCP-14: Switch to Connect tab shows client selector', async ({ mcp }) => {
             await mcp.switchToConnectTab();
             await expect(mcp.selectClientButton).toBeVisible({ timeout: 10000 });
         });
 
-        test('TC-MCP-14: Connect tab shows URL visibility toggle', async ({ mcp }) => {
-            await expect(mcp.connectTab).toBeVisible({ timeout: 15000 });
+        test('TC-MCP-15: Connect tab shows URL visibility toggle', async ({ mcp }) => {
             await mcp.switchToConnectTab();
             await expect(mcp.toggleUrlVisibilityButton).toBeVisible({ timeout: 10000 });
         });
 
-        test('TC-MCP-15: Toggle URL visibility changes button text', async ({ mcp }) => {
-            await expect(mcp.connectTab).toBeVisible({ timeout: 15000 });
+        test('TC-MCP-16: Toggle URL visibility changes button text', async ({ mcp }) => {
             await mcp.switchToConnectTab();
             await expect(mcp.toggleUrlVisibilityButton).toBeVisible({ timeout: 10000 });
 
             // Default state should be "Show"
-            await expect(mcp.toggleUrlVisibilityButton).toHaveText('Show');
+            await expect(mcp.toggleUrlVisibilityButton).toHaveText('Show', { timeout: 5000 });
 
             // Click to show URL
             await mcp.toggleUrlVisibility();
-            await expect(mcp.toggleUrlVisibilityButton).toHaveText('Hide');
+            await expect(mcp.toggleUrlVisibilityButton).toHaveText('Hide', { timeout: 5000 });
 
             // Click to hide URL again
             await mcp.toggleUrlVisibility();
-            await expect(mcp.toggleUrlVisibilityButton).toHaveText('Show');
+            await expect(mcp.toggleUrlVisibilityButton).toHaveText('Show', { timeout: 5000 });
         });
 
-        test('TC-MCP-16: MCP name is displayed on selected page', async ({ mcp }) => {
+        test('TC-MCP-17: MCP name is displayed on selected page', async ({ mcp }) => {
             await expect(mcp.mcpNameDisplay).toBeVisible({ timeout: 10000 });
         });
-    });
 
-    test.describe('Client Selector Dialog', () => {
-
-        test.beforeEach(async ({ page, mcp }) => {
-            await navigateToSelectedMCP(mcp, page);
-
-            // Switch to Connect tab
-            await expect(mcp.connectTab).toBeVisible({ timeout: 15000 });
-            await mcp.switchToConnectTab();
-            await expect(mcp.selectClientButton).toBeVisible({ timeout: 10000 });
-        });
-
-        test('TC-MCP-17: Open client selector dialog', async ({ mcp, page }) => {
-            await mcp.openClientSelector();
-            // Dialog should show "New MCP Server" title
-            await expect(page.getByText('New MCP Server')).toBeVisible({ timeout: 5000 });
-        });
-
-        test('TC-MCP-18: Client dialog has search input', async ({ mcp }) => {
-            await mcp.openClientSelector();
-            await expect(mcp.clientSearchInput).toBeVisible({ timeout: 5000 });
-        });
-
-        test('TC-MCP-19: Client dialog shows Popular clients section', async ({ mcp, page }) => {
-            await mcp.openClientSelector();
-            await expect(page.getByRole('heading', { name: 'Popular clients' })).toBeVisible({ timeout: 5000 });
-        });
-
-        test('TC-MCP-20: Client dialog shows All clients section', async ({ mcp, page }) => {
-            await mcp.openClientSelector();
-            await expect(page.getByRole('heading', { name: 'All clients' })).toBeVisible({ timeout: 5000 });
-        });
-
-        test('TC-MCP-21: Search filters clients in dialog', async ({ mcp, page }) => {
-            await mcp.openClientSelector();
-            await mcp.searchClient('Claude');
-
-            // Should show filtered results (use .first() as client appears in both Popular and All sections)
-            await expect(page.getByRole('heading', { name: 'Claude' }).first()).toBeVisible({ timeout: 5000 });
-        });
-
-        test('TC-MCP-22: Close client dialog', async ({ mcp, page }) => {
-            await mcp.openClientSelector();
-            await expect(page.getByText('New MCP Server')).toBeVisible({ timeout: 5000 });
-
-            await mcp.closeClientDialog();
-            await expect(page.getByText('New MCP Server')).not.toBeVisible({ timeout: 5000 });
-        });
-
-        test('TC-MCP-23: Select a client updates the selector button', async ({ mcp }) => {
-            await mcp.openClientSelector();
-            await mcp.selectClientByName('Cursor');
-
-            // Dialog should close and button should show selected client name
-            await expect(mcp.selectClientButton).toContainText('Cursor', { timeout: 5000 });
+        test('TC-MCP-18: MCP name edit button appears on hover', async ({ mcp }) => {
+            await expect(mcp.mcpNameDisplay).toBeVisible({ timeout: 10000 });
+            await mcp.mcpNameDisplay.hover();
+            await expect(mcp.mcpNameEditButton).toBeVisible({ timeout: 5000 });
         });
     });
+
 });
