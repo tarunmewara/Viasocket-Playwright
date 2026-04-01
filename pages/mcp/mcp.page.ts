@@ -17,23 +17,16 @@ export class MCPPage {
     readonly mainHeading: Locator;
     readonly existingMCPsHeading: Locator;
 
-    // Step cards
-    readonly stepOneCard: Locator;
-    readonly stepTwoCard: Locator;
-    readonly stepThreeCard: Locator;
-    readonly learnMoreLink: Locator;
+    // Mushroom Card (replaces old step cards)
+    readonly mushroomCard: Locator;
+    readonly mushroomCardHeading: Locator;
+    readonly mushroomCardChip: Locator;
 
-    // Get Started (no existing MCPs)
+    // Get Started button (opens Mushroom external URL)
     readonly getStartedButton: Locator;
 
     // Existing MCPs DataGrid
     readonly mcpDataGrid: Locator;
-
-    // Create New button (on landing page when MCPs exist)
-    readonly createNewButton: Locator;
-
-    // Generate Secure URL button (on new MCP form)
-    readonly generateSecureUrlButton: Locator;
 
     // Copy buttons (generic, used in URL column and config JSON)
     readonly copyButton: Locator;
@@ -41,13 +34,16 @@ export class MCPPage {
     // --- Selected MCP page (SelectedMCPPage.tsx) ---
 
     // Sidebar
+    readonly backButton: Locator;
     readonly yourMCPsHeading: Locator;
     readonly sidebarCreateNewButton: Locator;
     readonly mcpListItems: Locator;
+    readonly goToEmbedLink: Locator;
 
     // MCP name editing (MCPEmbed.tsx)
     readonly mcpNameDisplay: Locator;
     readonly mcpNameTextField: Locator;
+    readonly mcpNameEditButton: Locator;
 
     // --- Connect tab (MCPConnectSettings.tsx) ---
 
@@ -72,16 +68,13 @@ export class MCPPage {
         this.mainHeading = page.getByRole('heading', { name: 'viaSocket MCP' });
         this.existingMCPsHeading = page.getByRole('heading', { name: 'Existing MCPs' });
 
-        // Step cards (by subtitle text)
-        this.stepOneCard = page.getByText('Get Your MCP Endpoint');
-        this.stepTwoCard = page.getByText('Choose Your Actions');
-        this.stepThreeCard = page.getByRole('heading', { name: 'Connect Your AI Assistant' });
-        this.learnMoreLink = page.getByRole('link', { name: 'Learn More' });
+        // Mushroom Card (replaces old step cards)
+        this.mushroomCard = page.locator('.MuiCard-root').filter({ hasText: 'Create MCP Servers with Mushroom' });
+        this.mushroomCardHeading = page.getByRole('heading', { name: 'Create MCP Servers with Mushroom' });
+        this.mushroomCardChip = page.getByText('NEW PRODUCT');
 
-        // Landing page actions
-        this.getStartedButton = page.getByRole('button', { name: 'Get Started' });
-        this.createNewButton = page.getByRole('button', { name: 'Create New' }).and(page.locator(':not([data-testid])'));
-        this.generateSecureUrlButton = page.getByRole('button', { name: 'Generate Secure URL' });
+        // Landing page actions (Get Started now opens external Mushroom URL)
+        this.getStartedButton = page.getByRole('button', { name: 'GET STARTED' });
 
         // DataGrid
         this.mcpDataGrid = page.locator('.MuiDataGrid-root');
@@ -90,13 +83,16 @@ export class MCPPage {
         this.copyButton = page.getByTestId('copy-button');
 
         // Selected MCP sidebar
+        this.backButton = page.getByTestId('mcp-back-button');
         this.yourMCPsHeading = page.getByRole('heading', { name: 'Your MCPs' });
-        this.sidebarCreateNewButton = page.getByRole('link', { name: 'Create New' });
-        this.mcpListItems = page.getByRole('button').filter({ has: page.locator('.MuiListItemText-root') });
+        this.sidebarCreateNewButton = page.getByTestId('mcp-sidebar-create-new-button');
+        this.mcpListItems = page.getByTestId('mcp-sidebar-item');
+        this.goToEmbedLink = page.getByRole('link', { name: /Go to embed/i });
 
         // MCP name editing
-        this.mcpNameDisplay = page.getByRole('heading', { level: 4 });
-        this.mcpNameTextField = page.locator('#mcp-name-textfield');
+        this.mcpNameDisplay = page.getByTestId('mcp-name-display');
+        this.mcpNameTextField = page.getByTestId('mcp-name-textfield');
+        this.mcpNameEditButton = page.getByTestId('mcp-name-edit-button');
 
         // Configure / Connect tabs
         this.configureTab = page.getByRole('tab', { name: 'Configure' });
@@ -121,18 +117,6 @@ export class MCPPage {
         await this.getStartedButton.click();
     }
 
-    async clickCreateNew(): Promise<void> {
-        await this.createNewButton.click();
-    }
-
-    async clickGenerateSecureUrl(): Promise<void> {
-        await this.generateSecureUrlButton.click();
-    }
-
-    async clickLearnMore(): Promise<void> {
-        await this.learnMoreLink.click();
-    }
-
     async clickMCPRow(mcpName: string): Promise<void> {
         await this.mcpDataGrid.getByText(mcpName).click();
     }
@@ -143,8 +127,16 @@ export class MCPPage {
 
     // --- Selected MCP sidebar methods ---
 
+    async clickBackButton(): Promise<void> {
+        await this.backButton.click();
+    }
+
     async clickSidebarCreateNew(): Promise<void> {
         await this.sidebarCreateNewButton.click();
+    }
+
+    async clickGoToEmbed(): Promise<void> {
+        await this.goToEmbedLink.click();
     }
 
     async selectMCPByName(name: string): Promise<void> {

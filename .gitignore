@@ -5,7 +5,7 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
-# /playwright/.auth/
+/playwright/.auth/
 
 # Environment variables (contains auth state path — do not commit)
 .env
