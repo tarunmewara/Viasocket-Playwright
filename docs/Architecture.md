@@ -83,7 +83,7 @@ Viasocket-Playwright/
 │       ├── logs-viewer.component.ts   # Log accordion, expand/collapse, return to flow
 │       └── expert-feedback.component.ts     # Expert feedback — thumbs up/down, comment
 │
-├── modals/                            # Modal dialog abstractions (21 modals)
+├── modals/                            # Modal dialog abstractions (24 modals)
 │   ├── create-collection.modal.ts     # Create collection (name, suggestions, submit)
 │   ├── rename-collection.modal.ts     # Rename collection (input, RENAME button)
 │   ├── create-org.modal.ts            # Create organization (workspace name, industry, domain)
@@ -107,9 +107,15 @@ Viasocket-Playwright/
 │   ├── project-rename.modal.ts        # Project rename (input, confirm, cancel)
 │   ├── storage.modal.ts               # Storage collection creation
 │   ├── success.modal.ts               # Post-action success dialog (start, done)
-│   └── billing.modal.ts               # Billing submit/cancel/done dialog
+│   ├── billing.modal.ts               # Billing submit/cancel/done dialog
+│   └── update-connection.modal.ts     # Update connection (reason, send request)
 │
 ├── pages/                             # Page Object classes (organized by feature)
+│   ├── CollectionPage.ts              # Legacy collection page (being migrated)
+│   ├── DashboardPage.ts               # Legacy dashboard page (being migrated)
+│   ├── TriggersPage.ts                # Legacy triggers page (being migrated)
+│   ├── WorkflowPage.ts                # Legacy workflow page (being migrated)
+│   ├── WorkspacePage.ts               # Legacy workspace page (being migrated)
 │   ├── collection/
 │   │   └── collection.page.ts         # Collection listing, create, rename, context menu (composes CreateCollectionModal, RenameCollectionModal)
 │   ├── connections/
@@ -156,32 +162,70 @@ Viasocket-Playwright/
 │   ├── navigation.ts                  # URL navigation helpers
 │   └── test-data.ts                   # Random generators, test data helpers
 │
-├── tests/                             # Test spec files organized by feature
+├── helpers/                           # Test helpers (TO BE CREATED in Phase 4)
+│   ├── workflow.helper.ts             # Flow CRUD operations via API
+│   ├── testdata.helper.ts             # Test data generators
+│   ├── api.helper.ts                  # API seeding and cleanup
+│   └── throttle.helper.ts             # API rate limit control
+│
+├── tests/                             # Test spec files organized by feature (28 spec files, ~596 tests)
 │   ├── workflow/                      # Workflow & trigger tests
-│   │   ├── ask-ai.spec.ts
-│   │   ├── triggers.spec.ts
-│   │   ├── workflow.spec.ts
-│   │   ├── logs.spec.ts
-│   │   ├── publish.spec.ts
-│   │   └── flow-options.spec.ts
+│   │   ├── Action/                    # Action-specific tests
+│   │   │   └── Built-in-tools/
+│   │   │       ├── Delay/
+│   │   │       │   └── delay.spec.ts           # 53 tests - Delay action variations
+│   │   │       ├── HTTP_API_Request/
+│   │   │       │   ├── http-api-request.spec.ts         # 50 tests - Basic HTTP requests
+│   │   │       │   ├── http-api-request-advanced.spec.ts # 50 tests - Advanced HTTP features
+│   │   │       │   └── http-api-request-complex.spec.ts  # 50 tests - Complex HTTP scenarios
+│   │   │       ├── JS_code/
+│   │   │       │   └── js-code.spec.ts         # 80 tests - JS Code action tests
+│   │   │       └── Multipath/
+│   │   │           └── multipath.spec.ts       # 100 tests - Multipath logic tests
+│   │   ├── trigger/                   # Trigger-specific tests
+│   │   │   ├── cron/
+│   │   │   │   ├── cron.spec.ts               # 10 tests - Basic cron triggers
+│   │   │   │   └── cronAdvance.spec.ts        # 10 tests - Advanced cron features
+│   │   │   ├── emailtoflow/
+│   │   │   │   └── emailtoflow.spec.ts        # 13 tests - Email to flow trigger
+│   │   │   ├── pluginApps/
+│   │   │   │   └── plugin.spec.ts             # 16 tests - Plugin app triggers
+│   │   │   └── webhook/
+│   │   │       └── webhook.spec.ts            # 12 tests - Webhook trigger tests
+│   │   ├── ask-ai.spec.ts             # 29 tests - Ask AI chatbot functionality
+│   │   ├── trigger.spec.ts            # 3 tests - General trigger tests
+│   │   └── workflow.spec.ts           # 2 tests - Workflow visibility & naming
 │   ├── collection/
-│   │   └── collection.spec.ts
-│   ├── workspace/
-│   │   └── workspace.spec.ts
-│   ├── settings/
-│   │   └── settings.spec.ts
+│   │   └── collection.spec.ts         # 13 tests - Collection CRUD operations
 │   ├── connections/
-│   │   └── connections.spec.ts
+│   │   └── connections.spec.ts        # TODO - Connection management tests
+│   ├── dashboard/
+│   │   └── dashboard-search.spec.ts   # 6 tests - Dashboard search functionality
+│   ├── interface/
+│   │   └── interface-config.spec.ts   # Interface embed configuration tests
+│   ├── mcp/
+│   │   └── mcp.spec.ts                # 18 tests - MCP server client tests
+│   ├── settings/
+│   │   └── settings.spec.ts           # TODO - Workspace settings & billing tests
+│   ├── templates/
+│   │   └── templates.spec.ts          # 33 tests - Template search, sort, filter
 │   ├── transfer/
-│   │   └── transfer.spec.ts
+│   │   └── transfer.spec.ts           # Data transfer tests
+│   ├── workspace/
+│   │   ├── workspace.spec.ts          # 3 tests - Workspace CRUD
+│   │   └── workspace-selection.spec.ts # 9 tests - Workspace selection flow
 │   ├── workspace-notes/
-│   │   └── workspace-notes.spec.ts
-│   └── interface/
-│       └── interface-config.spec.ts
+│   │   └── workspace-notes.spec.ts    # 11 tests - Workspace notes functionality
+│   ├── collection.spec.ts             # 6 tests (commented) - Legacy collection tests
+│   ├── triggers.spec.ts               # 14 tests (commented) - Legacy trigger tests
+│   └── workflow.spec.ts               # 5 tests (commented) - Legacy workflow tests
 │
 ├── docs/                              # Documentation
-│   ├── Architecture.md                # ← This file
-│   └── Ai-INSTRUCTION.md             # AI codegen rules & fixture reference
+│   ├── Architecture.md                # ← This file - Framework architecture
+│   ├── Ai-INSTRUCTION.md             # AI codegen rules & fixture reference
+│   ├── AI-instruction-testcases      # Test optimization guidelines (rate limits, reusability)
+│   ├── TEST-OPTIMIZATION-PLAN.md     # 9-phase plan to optimize test suite
+│   └── code-style-guide.md           # Code style and component guidelines
 │
 ├── playwright.config.ts               # Playwright configuration
 ├── tsconfig.json                      # TypeScript configuration
@@ -344,6 +388,22 @@ export const test = base.extend<MyFixtures>({
 5. **Use constants** - Never hardcode selectors or strings
 6. **Component pattern** - Break complex UIs into components
 7. **API for setup** - Use `api` fixture for test data setup when possible
+
+---
+
+## Test Suite Status
+
+### Current Test Count: ~596 Tests Across 28 Spec Files
+
+**⚠️ OPTIMIZATION NEEDED:** Test suite has significant redundancy and API usage issues.
+
+#### High-Priority Optimization Targets:
+- **Multipath:** 100 tests → Target: 15 tests (85% reduction)
+- **JS Code:** 80 tests → Target: 20 tests (75% reduction)
+- **HTTP API Request:** 150 tests (3 files) → Target: 25 tests (83% reduction)
+- **Triggers:** 40+ tests → Target: 12 tests (70% reduction)
+
+**See `TEST-OPTIMIZATION-PLAN.md` for detailed optimization strategy.**
 
 ---
 

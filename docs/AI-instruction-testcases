@@ -1,0 +1,261 @@
+# 🤖 AI INSTRUCTIONS — TESTCASE GENERATION (VIASOCKET PLAYWRIGHT)
+
+## 🎯 Objective
+
+Generate **optimized, scalable, and non-redundant Playwright testcases** for Viasocket ensuring:
+
+* Minimal API usage (respect rate limits)
+* High reusability
+* Full coverage with fewer tests
+* Zero flaky / dependent tests
+
+---
+
+# 🚨 HARD CONSTRAINTS (MUST FOLLOW)
+
+## 1. Rate Limiting Awareness
+
+* System limit: **600 API calls / 10 seconds / IP**
+* DO NOT create flows/collections in every test
+* Prefer:
+
+  * `beforeAll` setup (shared resources)
+  * API seeding over UI setup
+* Avoid unnecessary cleanup APIs
+
+---
+
+## 2. Test Independence
+
+* Each test must be **independent by default**
+* DO NOT depend on other tests
+* If dependency is unavoidable:
+
+  * Use `test.describe.serial`
+  * OR merge steps using `test.step()`
+
+---
+
+## 3. Reuse vs Isolation Rule
+
+### ✅ Reuse shared data ONLY IF:
+
+* Test is read-only
+* No mutation (edit/delete/update)
+* No side effects
+
+### ❌ Create fresh data IF:
+
+* Test modifies state
+* Test deletes/updates entities
+* Parallel execution may conflict
+
+---
+
+## 4. API Usage Optimization
+
+### Use API for:
+
+* Setup (create flow, collection, connection)
+* Pre-seeding test data
+
+### Avoid API for:
+
+* Cleanup (prefer random names)
+* Repeated identical setup
+
+---
+
+## 5. Test Count Optimization
+
+* DO NOT create 1 test per variation
+* Use parameterization:
+
+```ts
+['webhook', 'cron', 'plugin'].forEach(type => {
+  test(`validate ${type}`, async () => {});
+});
+```
+
+* Prefer **40 high-quality tests over 100 redundant tests**
+
+---
+
+# 🧱 TEST STRUCTURE RULES
+
+## 1. File Naming Convention
+
+* `*.high-api.spec.ts` → heavy API usage (low workers)
+* `*.low-api.spec.ts` → UI focused (high workers)
+
+---
+
+## 2. Folder Structure
+
+```
+tests/
+  workflow/
+    triggers.high-api.spec.ts
+    jscode-readonly.spec.ts
+    jscode-mutation.spec.ts
+    logs.low-api.spec.ts
+```
+
+---
+
+## 3. Test Grouping
+
+Group by behavior, NOT UI pages:
+
+❌ Wrong:
+
+* `workflow.spec.ts` (everything inside)
+
+✅ Correct:
+
+* `triggers.spec.ts`
+* `actions.spec.ts`
+* `logs.spec.ts`
+
+---
+
+# ⚙️ PLAYWRIGHT BEST PRACTICES
+
+## MUST USE:
+
+* Fixtures (`base.fixture.ts`)
+* Page Object Model
+* `safeClick`, `safeFill`
+* `getByTestId()`
+
+## NEVER USE:
+
+* Raw selectors
+* `page.click()` directly
+* Hardcoded waits (`waitForTimeout`)
+
+---
+
+# 🧠 TEST DESIGN STRATEGY
+
+## Categorize tests into:
+
+### 🟢 Read-Only Tests
+
+* Validate UI, logs, outputs
+* Use shared setup (`beforeAll`)
+
+### 🔴 Mutation Tests
+
+* Edit/delete/update flows
+* Create fresh data per test
+
+### 🟡 Edge/Error Tests
+
+* Invalid inputs
+* Failures
+* Minimal setup
+
+---
+
+# 🔁 EXECUTION STRATEGY
+
+## Worker Configuration
+
+* High API tests → `workers: 1`
+* Low API tests → `workers: 4+`
+
+---
+
+## Throttling (if API used in loop)
+
+Always ensure controlled API calls:
+
+* Avoid bursts
+* Use helper/throttle if needed
+
+---
+
+# 🧩 REUSABILITY PATTERNS
+
+## Use Helpers
+
+Create reusable helpers:
+
+```ts
+workflowHelper.createBasicFlow(type)
+workflowHelper.addJSCode(code)
+workflowHelper.publishFlow()
+```
+
+---
+
+## Use Test Data Generators
+
+```ts
+TestDataUtils.flowName()
+TestDataUtils.invalidInputs()
+```
+
+---
+
+# 🧪 ASSERTION RULES
+
+* Always validate:
+
+  * UI state
+  * API result (if applicable)
+  * Logs / execution result
+
+* Avoid weak assertions:
+  ❌ `expect(true).toBeTruthy()`
+
+---
+
+# 🛑 FAILURE HANDLING
+
+## DO NOT:
+
+* Ignore failures
+* Silently skip tests
+
+## ALLOWED:
+
+* Use `describe.serial` for dependent flows
+* Use fixture-based skip if setup fails
+
+---
+
+# 📉 ANTI-PATTERNS (STRICTLY PROHIBITED)
+
+❌ Creating flow in every test
+❌ Repeating same setup logic
+❌ Writing 100+ similar tests
+❌ Using global shared mutable state
+❌ Test depending on another test
+❌ Excessive API cleanup
+
+---
+
+# 🚀 EXPECTED OUTPUT FROM AI
+
+When generating testcases, AI must:
+
+1. Minimize API calls
+2. Use parameterization wherever possible
+3. Separate read-only vs mutation tests
+4. Follow folder & naming conventions
+5. Use fixtures and helpers
+6. Ensure parallel-safe execution
+7. Avoid redundant coverage
+
+---
+
+# 🎯 FINAL GOAL
+
+> Maximum coverage
+> Minimum tests
+> Zero flakiness
+> Scalable test suite
+
+---
