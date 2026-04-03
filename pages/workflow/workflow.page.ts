@@ -88,6 +88,11 @@ export class WorkflowPage {
     readonly inflowWebhookNode: Locator;    // inflow-node-webhook
     readonly inflowEmailNode: Locator;      // inflow-node-email
 
+    // Flow more options menu (flowPageMoreOptions.tsx)
+    readonly flowMoreOptionsButton: Locator;    // data-testid='flow-more-options-button'
+    readonly flowDeleteConfirmButton: Locator;  // data-testid='flow-delete-confirm-button'
+    readonly flowDeleteCancelButton: Locator;   // data-testid='flow-delete-cancel-button'
+
     constructor(page: Page) {
         this.page = page;
 
@@ -160,6 +165,11 @@ export class WorkflowPage {
         this.inflowCronNode = page.getByTestId('inflow-node-cron');
         this.inflowWebhookNode = page.getByTestId('inflow-node-webhook');
         this.inflowEmailNode = page.getByTestId('inflow-node-email');
+
+        // Flow more options menu
+        this.flowMoreOptionsButton = page.getByTestId('flow-more-options-button');
+        this.flowDeleteConfirmButton = page.getByTestId('flow-delete-confirm-button');
+        this.flowDeleteCancelButton = page.getByTestId('flow-delete-cancel-button');
     }
 
     // --- Publish ---

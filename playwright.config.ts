@@ -24,10 +24,10 @@ export default defineConfig({
     forbidOnly: !!process.env.CI,
 
     /* Retry on CI only */
-    retries: process.env.CI ? 2 : 0,
+    retries: 0,
 
     /* Opt out of parallel tests on CI. */
-    workers: process.env.CI ? 8 : 6,
+    workers: 1,
 
     /* Increase global test timeout to 120 seconds */
     timeout: 60000,
@@ -42,6 +42,7 @@ export default defineConfig({
 
     /* Shared settings for all the projects below. */
     use: {
+        headless: false,
         screenshot: 'only-on-failure',
         video: 'retain-on-failure',
         trace: 'retain-on-failure',

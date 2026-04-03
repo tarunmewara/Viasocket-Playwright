@@ -106,6 +106,10 @@ export class DashboardPage {
         await this.searchPanelCloseButton.click();
     }
 
+    async selectSearchResult(index: number = 0): Promise<void> {
+        await this.page.getByTestId('search-flow-result').nth(index).click();
+    }
+
     async goBack(): Promise<void> {
         await this.backButton.click();
     }
