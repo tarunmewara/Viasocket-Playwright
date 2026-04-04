@@ -52,6 +52,11 @@ export default defineConfig({
         // Auth storage state loaded from .env (STORAGE_STATE=playwright/.auth/user.json)
         // This is used for login bypass — the user.json file contains saved browser session data
         storageState,
+
+        // Slow down operations to avoid rate limit errors (1015)
+        launchOptions: {
+            slowMo: 2000
+        }
     },
 
     /* Configure projects for major browsers */

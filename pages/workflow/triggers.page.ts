@@ -48,6 +48,22 @@ export class TriggersPage {
     // Add Sample Payload button in inFlow mode (data-testid='webhook-add-sample-payload-button')
     readonly webhookAddSamplePayloadButton: Locator;
 
+    // Advance config (WrappedGoBackButtonInWebhookOrCron.tsx)
+    readonly advanceConfigGoBackButton: Locator;  // data-testid='advance-config-go-back-btn'
+
+    // Variable popover (VariablePopoverMenu.tsx)
+    readonly variablePopoverCloseButton: Locator;  // data-testid='variable-popover-close-button'
+
+    // Built-in tools (AddStepSearchView.tsx)
+    readonly builtinToolJsCodeOption: Locator;  // Built-in tool option for JS Code
+
+    // AI description input (DescriptionComponent.tsx)
+    readonly aiDescriptionInput: Locator;  // Textbox for AI high-level description
+
+    // Plugin trigger buttons (triggerDryRunButton.tsx, SaveButtonForTrigger.tsx)
+    readonly triggerDryRunTestButton: Locator;  // data-testid='trigger-dry-run-test-button'
+    readonly triggerSaveButton: Locator;        // data-testid='trigger-save-button'
+
     // Email trigger locators are now on EmailComponent (triggers.email)
 
     // --- Plugin trigger action list (ActionsListAutocomplete.tsx) ---
@@ -82,6 +98,22 @@ export class TriggersPage {
         this.webhookPayloadTab = page.getByTestId('webhook-payload-tab');
         this.webhookSendSampleTab = page.getByTestId('webhook-send-sample-tab');
         this.webhookAddSamplePayloadButton = page.getByTestId('webhook-add-sample-payload-button');
+
+        // Advance config
+        this.advanceConfigGoBackButton = page.getByTestId('advance-config-go-back-btn');
+
+        // Variable popover
+        this.variablePopoverCloseButton = page.getByTestId('variable-popover-close-button');
+
+        // Built-in tools - JS Code option (using builtin-tool-option with name filter)
+        this.builtinToolJsCodeOption = page.getByTestId('builtin-tool-option').filter({ hasText: 'JS Code' });
+
+        // AI description input
+        this.aiDescriptionInput = page.getByPlaceholder('Provide a high-level description of the task.');
+
+        // Plugin trigger buttons
+        this.triggerDryRunTestButton = page.getByTestId('trigger-dry-run-test-button');
+        this.triggerSaveButton = page.getByTestId('trigger-save-button');
 
         // Email trigger locators are on this.email (EmailComponent)
 

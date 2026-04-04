@@ -511,10 +511,21 @@ export class MultipathComponent {
     // ── Canvas interaction ─────────────────────────────────────────────────
 
     /**
-     * Click a path node on the canvas to open/reopen the slider.
-     */
-    async clickCanvasPathNode(text: string): Promise<void> {
-        await this.page.locator(`p:text-is("${text}")`).first().click();
+     * 
+     * 
+     * 
+     
+     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+     fthis.page.locator(`p:text-is("${text}")`).first().click();
     }
 
     /**

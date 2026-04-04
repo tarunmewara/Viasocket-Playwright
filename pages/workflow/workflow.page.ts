@@ -87,11 +87,20 @@ export class WorkflowPage {
     readonly inflowCronNode: Locator;       // inflow-node-cron
     readonly inflowWebhookNode: Locator;    // inflow-node-webhook
     readonly inflowEmailNode: Locator;      // inflow-node-email
+    readonly inflowTriggerNode: Locator;    // inflow-node-trigger (for plugin triggers)
 
     // Flow more options menu (flowPageMoreOptions.tsx)
     readonly flowMoreOptionsButton: Locator;    // data-testid='flow-more-options-button'
     readonly flowDeleteConfirmButton: Locator;  // data-testid='flow-delete-confirm-button'
     readonly flowDeleteCancelButton: Locator;   // data-testid='flow-delete-cancel-button'
+
+    // Flow header buttons (flowJsonHeader.tsx)
+    readonly flowHeaderRunIfButton: Locator;    // data-testid='flow-header-run-if-button'
+    readonly saveButton: Locator;               // data-testid='save-button'
+
+    // Advance config switches (webhookAndCronAdvanceConfigSlider.tsx, preCondition.tsx)
+    readonly hitFlowIndividuallySwitch: Locator;  // data-testid='hit-flow-individually-switch'
+    readonly preConditionSwitch: Locator;         // data-testid='pre-condition-switch'
 
     constructor(page: Page) {
         this.page = page;
@@ -165,11 +174,20 @@ export class WorkflowPage {
         this.inflowCronNode = page.getByTestId('inflow-node-cron');
         this.inflowWebhookNode = page.getByTestId('inflow-node-webhook');
         this.inflowEmailNode = page.getByTestId('inflow-node-email');
+        this.inflowTriggerNode = page.getByTestId('inflow-node-trigger');
 
         // Flow more options menu
         this.flowMoreOptionsButton = page.getByTestId('flow-more-options-button');
         this.flowDeleteConfirmButton = page.getByTestId('flow-delete-confirm-button');
         this.flowDeleteCancelButton = page.getByTestId('flow-delete-cancel-button');
+
+        // Flow header buttons
+        this.flowHeaderRunIfButton = page.getByTestId('flow-header-run-if-button');
+        this.saveButton = page.getByTestId('save-button');
+
+        // Advance config switches
+        this.hitFlowIndividuallySwitch = page.getByTestId('hit-flow-individually-switch');
+        this.preConditionSwitch = page.getByTestId('pre-condition-switch');
     }
 
     // --- Publish ---
