@@ -17,6 +17,8 @@ export class WorkspacePage {
     // Workspace popover & trigger (selectedWorkspace.tsx)
     readonly workspacePopover: Locator;
     readonly workspaceTrigger: Locator;
+    readonly workspaceTriggerExpanded: Locator;
+    readonly expandIcon: Locator;
 
     // Workspace menu nav items (rendered via ListGroupedComponent, no individual data-testid)
     readonly switchWorkspaceLink: Locator;
@@ -62,6 +64,8 @@ export class WorkspacePage {
         // data-testid locators from selectedWorkspace.tsx
         this.workspacePopover = page.getByTestId('workspace-popover');
         this.workspaceTrigger = page.getByTestId('workspace-trigger');
+        this.workspaceTriggerExpanded = page.getByTestId('workspace-trigger-expanded');
+        this.expandIcon = page.locator('[data-testid="ExpandMoreIcon"]');
         this.betaSwitch = page.getByTestId('workspace-beta-switch');
         this.betaConfirmButton = page.getByTestId('workspace-beta-confirm');
         this.betaCancelButton = page.getByTestId('workspace-beta-cancel');
@@ -91,11 +95,12 @@ export class WorkspacePage {
         this.profileEditMenuItem = page.getByTestId('workspace-edit-profile-menu-item');
         this.profileLogoutMenuItem = page.getByTestId('workspace-logout-menu-item');
 
-        // Role/text based locators (workSpaceLink items have no data-testid)
-        this.switchWorkspaceLink = page.getByRole('link', { name: 'Switch Workspace' });
-        this.workspaceSettingsLink = page.getByRole('link', { name: 'Workspace Settings' });
-        this.membersLink = page.getByRole('link', { name: 'Members' });
-        this.notificationsLink = page.getByRole('link', { name: 'Notifications' });
+        // Stable data-testid locators for workspace menu items
+        this.switchWorkspaceLink = page.getByTestId('workspace-menu-switch-workspace');
+        this.workspaceSettingsLink = page.getByTestId('workspace-menu-settings');
+        this.membersLink = page.getByTestId('workspace-menu-members');
+        this.notificationsLink = page.getByTestId('workspace-menu-notifications');
+        // Edit Profile and Logout are in profile menu, not workspace menu
         this.editProfileLink = page.getByRole('link', { name: 'Edit Profile' });
         this.logoutLink = page.getByRole('button', { name: 'Log Out' });
     }
@@ -152,10 +157,13 @@ export class WorkspacePage {
     // --- Workspace menu ---
 
     async openWorkspaceMenu(): Promise<void> {
-        // Sidebar expanded (default): Stack with org name h6 — no data-testid
-        // Sidebar collapsed: Box with data-testid='workspace-trigger'
-        const expandedTrigger = this.page.locator('h6').first();
-        await this.workspaceTrigger.or(expandedTrigger).first().click();
+        // Click the workspace trigger using stable data-testid
+        // Handles both collapsed (workspace-trigger) and expanded (workspace-trigger-expanded) states
+        const trigger = this.workspaceTrigger.or(this.workspaceTriggerExpanded);
+        await trigger.waitFor({ state: 'visible', timeout: 10000 });
+        await trigger.click();
+        // Wait for menu to be visible and stable
+        await this.switchWorkspaceLink.waitFor({ state: 'visible', timeout: 5000 });
     }
 
     async switchWorkspace(): Promise<void> {
@@ -175,7 +183,8 @@ export class WorkspacePage {
     }
 
     async goToEditProfile(): Promise<void> {
-        await this.editProfileLink.click();
+        // Edit Profile is in the profile menu, use the profile menu item
+        await this.profileEditMenuItem.click();
     }
 
     async logout(): Promise<void> {
@@ -234,8 +243,11 @@ export class WorkspacePage {
     }
 
     async getWorkspaceName(): Promise<string> {
-        const nameEl = this.workspaceTrigger.locator('h6');
-        return (await nameEl.textContent()) ?? '';
+        // Get workspace name from the expanded trigger element
+        const nameEl = this.workspaceTriggerExpanded.locator('h6');
+        await nameEl.waitFor({ state: 'visible', timeout: 5000 });
+        const text = await nameEl.textContent();
+        return text?.trim() ?? '';
     }
 
     async isBetaEnabled(): Promise<boolean> {

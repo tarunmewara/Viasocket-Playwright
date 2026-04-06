@@ -92,13 +92,13 @@ async function globalSetup(config: FullConfig) {
 
     // Verify the injected token works
     const page = await context.newPage();
-    await page.goto(`${baseURL}/org`);
+    await page.goto(`${baseURL}/org`, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
     const authHeading = page.getByRole('heading', { name: 'Select a Workspace' });
     const loginHeading = page.getByRole('heading', { name: 'Log in' });
     const result = await Promise.race([
-        authHeading.waitFor({ timeout: 15000 }).then(() => 'auth' as const),
-        loginHeading.waitFor({ timeout: 15000 }).then(() => 'login' as const),
+        authHeading.waitFor({ timeout: 20000 }).then(() => 'auth' as const),
+        loginHeading.waitFor({ timeout: 20000 }).then(() => 'login' as const),
     ]).catch(() => 'timeout' as const);
 
     if (result !== 'auth') {
@@ -126,15 +126,15 @@ async function validateStorageState(baseURL: string): Promise<boolean> {
     try {
         const context = await browser.newContext({ storageState: STORAGE_PATH });
         const page = await context.newPage();
-        await page.goto(`${baseURL}/org`);
+        await page.goto(`${baseURL}/org`, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
         const authenticated = page.getByRole('heading', { name: 'Select a Workspace' });
         const loginPage = page.getByRole('heading', { name: 'Log in' });
 
-        // Wait for whichever heading appears first (up to 15s)
+        // Wait for whichever heading appears first (up to 20s)
         const result = await Promise.race([
-            authenticated.waitFor({ timeout: 15000 }).then(() => 'auth' as const),
-            loginPage.waitFor({ timeout: 15000 }).then(() => 'login' as const),
+            authenticated.waitFor({ timeout: 20000 }).then(() => 'auth' as const),
+            loginPage.waitFor({ timeout: 20000 }).then(() => 'login' as const),
         ]).catch(() => 'timeout' as const);
 
         return result !== 'login';
