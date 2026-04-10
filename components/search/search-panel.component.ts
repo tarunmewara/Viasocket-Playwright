@@ -33,20 +33,20 @@ export class SearchPanelComponent {
 
         // Search Input
         this.searchInput = page.getByTestId('search-panel-input');
-        this.shortcutChip = page.locator('.search-panel-container').getByRole('button', { name: /Ctrl K|Cmd K/ });
+        this.shortcutChip = page.getByRole('button', { name: /Ctrl K|Cmd K/ });
 
         // Loading & Empty States
-        this.loadingText = page.locator('.search-panel-container').getByText('Loading...');
-        this.noResultsText = page.locator('.search-panel-container').getByRole('heading', { name: 'No results found' });
+        this.loadingText = page.getByText('Loading...', { exact: true });
+        this.noResultsText = page.getByRole('heading', { name: 'No results found', exact: true });
 
         // Section Headings
-        this.flowsSectionHeading = page.locator('.search-panel-container').getByRole('heading', { name: 'Flows' });
-        this.logsSectionHeading = page.locator('.search-panel-container').getByRole('heading', { name: 'Logs' });
+        this.flowsSectionHeading = page.getByRole('heading', { name: 'Flows', exact: true });
+        this.logsSectionHeading = page.getByRole('heading', { name: 'Logs', exact: true });
 
-        // Results List
-        this.resultsList = page.locator('.search-panel-container').getByRole('listbox');
-        this.flowResultItems = page.locator('.search-panel-container li[role="option"]');
-        this.logResultItems = page.locator('.search-panel-container li[role="option"]');
+        // Results List — use listbox role scoped to search autocomplete
+        this.resultsList = page.locator('[role="listbox"]');
+        this.flowResultItems = page.getByTestId('search-flow-result');
+        this.logResultItems = page.getByTestId('search-log-result');
     }
 
     async close(): Promise<void> {
@@ -75,17 +75,15 @@ export class SearchPanelComponent {
     }
 
     getFlowResultByName(flowName: string): Locator {
-        return this.page.locator('.search-panel-container li[role="option"]').filter({ hasText: flowName });
+        return this.page.getByTestId('search-flow-result').filter({ hasText: flowName });
     }
 
     async clickFlowResult(flowName: string): Promise<void> {
-        const result = this.page.locator('.search-panel-container li[role="option"]').filter({ hasText: flowName });
-        await result.click();
+        await this.page.getByTestId('search-flow-result').filter({ hasText: flowName }).click();
     }
 
     async clickLogResult(flowName: string): Promise<void> {
-        const result = this.page.locator('.search-panel-container li[role="option"]').filter({ hasText: flowName });
-        await result.click();
+        await this.page.getByTestId('search-log-result').filter({ hasText: flowName }).click();
     }
 
     async clickNthResult(index: number): Promise<void> {
@@ -129,7 +127,7 @@ export class SearchPanelComponent {
     }
 
     async getFlowResultStatus(flowName: string): Promise<string> {
-        const row = this.page.locator('.search-panel-container li[role="option"]').filter({ hasText: flowName });
+        const row = this.page.getByTestId('search-flow-result').filter({ hasText: flowName });
         const chip = row.getByRole('status').first();
         return (await chip.textContent()) ?? '';
     }
