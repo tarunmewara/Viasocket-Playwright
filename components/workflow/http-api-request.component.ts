@@ -104,12 +104,12 @@ export class HttpApiRequestComponent {
         // Add-step flow
         this.addStepButton = page.getByTestId('add-step-button');
         this.httpApiRequestOption = page.getByRole('option', { name: 'HTTP API Request' });
-        this.closeOverlayButton = page.getByRole('button').filter({ hasText: /^$/ }).first();
+        this.closeOverlayButton = page.getByTestId('slider-back-button');
 
-        // Accordion buttons — use locator-based selectors (getByRole may fail due to aria-hidden)
+        // Accordion buttons — ID-based selectors (stable, no testid on AccordionSummary)
         this.apiEditorAccordionBtn = page.locator('#panel1a-header');
         this.curlAccordionBtn = page.locator('#accordion-summary-curl');
-        this.inputValuesAccordionBtn = page.locator('button').filter({ hasText: 'Input Values' });
+        this.inputValuesAccordionBtn = page.getByTestId('input-values-accordion-summary');
 
         // Method dropdown — CSS selector avoids aria-hidden breakage from MUI Popover
         this.methodDropdown = page.locator('[role="combobox"][aria-label="Without label"]').first();
@@ -120,12 +120,12 @@ export class HttpApiRequestComponent {
         // Query params
         this.queryParamsLabel = page.getByText('Query params', { exact: true });
         this.queryParamsBulkEdit = page.locator('#queryparamsBulkEdit');
-        this.queryParamsKeyValueBtn = this.queryParamsLabel.locator('..').getByRole('button', { name: 'Key-Value Edit' });
+        this.queryParamsKeyValueBtn = page.getByTestId('query-params-key-value-edit-button');
 
         // Headers
         this.headersLabel = page.getByText('Headers', { exact: true });
         this.headersBulkEdit = page.locator('#headersBulkEdit');
-        this.headersKeyValueBtn = this.headersLabel.locator('..').getByRole('button', { name: 'Key-Value Edit' });
+        this.headersKeyValueBtn = page.getByTestId('headers-key-value-edit-button');
 
         // Body radio buttons
         this.bodyLabel = page.getByText('Body', { exact: true });
@@ -140,7 +140,7 @@ export class HttpApiRequestComponent {
 
         // cURL section
         this.curlTextbox = page.getByPlaceholder(/Provide cURL command/);
-        this.curlApplyButton = page.locator('button').filter({ hasText: /^Apply$/ });
+        this.curlApplyButton = page.getByTestId('import-curl-apply-button');
 
         // API name & panel header
         this.apiNameInput = page.getByPlaceholder('Api Name');
@@ -155,8 +155,8 @@ export class HttpApiRequestComponent {
         this.headersBulkTextbox = bulkTextboxes.nth(1);
 
         // Bulk Edit buttons (visible after Key-Value Edit toggle)
-        this.queryParamsBulkEditBtn = this.queryParamsLabel.locator('..').getByRole('button', { name: 'Bulk Edit' });
-        this.headersBulkEditBtn = this.headersLabel.locator('..').getByRole('button', { name: 'Bulk Edit' });
+        this.queryParamsBulkEditBtn = page.getByTestId('query-params-bulk-edit-button');
+        this.headersBulkEditBtn = page.getByTestId('headers-bulk-edit-button');
 
         // Body / editor area
         this.apiEditorRegion = page.getByRole('region', { name: 'API Editor' });
@@ -183,12 +183,12 @@ export class HttpApiRequestComponent {
         // Radio group (body type)
         this.bodyRadioGroup = page.getByRole('radiogroup');
 
-        // Field mapping chip buttons
-        this.fieldMappingButtons = page.getByRole('button', { name: 'Click for Field Mapping' });
+        // Field mapping chip buttons — no testid; scoped by aria-label on the chip button
+        this.fieldMappingButtons = page.locator('button[aria-label="Click for Field Mapping"]');
 
-        // Canvas step nodes
-        this.httpApiStepNode = page.getByText('HTTP_API_Request');
-        this.configureStepNode = page.getByText('Configure');
+        // Canvas step nodes — no testid on canvas nodes; scoped to paragraph text elements
+        this.httpApiStepNode = page.locator('p').filter({ hasText: /^HTTP_API_Request$/ }).first();
+        this.configureStepNode = page.locator('p').filter({ hasText: /^Configure$/ }).first();
     }
 
     // ── Add-step flow ──────────────────────────────────────────────────────────

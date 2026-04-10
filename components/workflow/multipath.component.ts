@@ -48,7 +48,7 @@ export class MultipathComponent {
         this.addStepButton = page.getByTestId('add-step-button');
         this.multipathOption = page.getByTestId('builtin-tool-option')
             .filter({ hasText: 'Multiple Paths' });
-        this.closeOverlayButton = page.getByRole('button').filter({ hasText: /^$/ }).first();
+        this.closeOverlayButton = page.getByTestId('slider-back-button');
 
         // If Block Slider panel — data-testid selectors
         this.addConditionButton = page.getByTestId('ifblock-add-condition-button');
@@ -63,11 +63,11 @@ export class MultipathComponent {
             'This path is executed when none of the other conditions are met.'
         );
 
-        // Expression button — use locator to avoid aria-hidden issues
-        this.expressionButton = page.locator('button:text-is("Expression")');
+        // Expression button — filter by exact text (no testid available)
+        this.expressionButton = page.locator('button').filter({ hasText: /^Expression$/ });
 
-        // Panel heading
-        this.panelHeading = page.locator('h5:text-is("MultiPath")');
+        // Panel heading — role-based heading with exact name
+        this.panelHeading = page.getByRole('heading', { name: 'MultiPath', exact: true });
     }
 
     // ── Add-step flow ──────────────────────────────────────────────────────
@@ -230,11 +230,11 @@ export class MultipathComponent {
         // After successful save, the panel closes (setParams sets stepId/slugName to null).
         // Wait for the MultiPath heading to disappear as confirmation.
         try {
-            await this.page.locator('h5:text-is("MultiPath")').waitFor({ state: 'hidden', timeout: 10000 });
+            await this.panelHeading.waitFor({ state: 'hidden', timeout: 10000 });
         } catch {
             // Panel didn't close — save may not have registered. Retry once.
             await this.save();
-            await this.page.locator('h5:text-is("MultiPath")').waitFor({ state: 'hidden', timeout: 10000 });
+            await this.panelHeading.waitFor({ state: 'hidden', timeout: 10000 });
         }
         // Small buffer for canvas to update
         await this.page.waitForTimeout(500);
@@ -304,7 +304,7 @@ export class MultipathComponent {
      * Uses CSS :text-is() pseudo-class to avoid aria-hidden issues.
      */
     getPathAccordionHeader(pathNumber: number): Locator {
-        return this.page.locator(`h6:text-is("Path ${pathNumber}")`);
+        return this.page.locator('h6').filter({ hasText: new RegExp(`^Path ${pathNumber}$`) });
     }
 
     async clickPathAccordion(pathNumber: number): Promise<void> {
@@ -328,7 +328,7 @@ export class MultipathComponent {
      * Note: Else block only exists AFTER saving the first condition path.
      */
     getElseAccordionHeader(): Locator {
-        return this.page.locator('h6:text-is("Else")');
+        return this.page.locator('h6').filter({ hasText: /^Else$/ });
     }
 
     async clickElseAccordion(): Promise<void> {
@@ -354,7 +354,7 @@ export class MultipathComponent {
     // ── Draft chip ─────────────────────────────────────────────────────────
 
     getDraftChip(): Locator {
-        return this.page.locator('.MuiChip-label').filter({ hasText: 'Draft' });
+        return this.page.locator('[role="button"]').filter({ hasText: /^Draft$/ });
     }
 
     async isDraftChipVisible(): Promise<boolean> {
@@ -365,7 +365,7 @@ export class MultipathComponent {
      * Get Configure chip on canvas node.
      */
     getConfigureChip(): Locator {
-        return this.page.locator('.MuiChip-label').filter({ hasText: 'Configure' });
+        return this.page.locator('[role="button"]').filter({ hasText: /^Configure$/ });
     }
 
     // ── Expression ─────────────────────────────────────────────────────────
@@ -385,21 +385,21 @@ export class MultipathComponent {
      * MUI Badge: <span class="MuiBadge-badge MuiBadge-colorSuccess">True</span>
      */
     getCanvasTrueBadge(): Locator {
-        return this.page.locator('.MuiBadge-badge.MuiBadge-colorSuccess');
+        return this.page.locator('[class*="MuiBadge-badge"][class*="colorSuccess"]');
     }
 
     /**
      * Get the False badge (red) on canvas — appears when condition evaluates to false.
      */
     getCanvasFalseBadge(): Locator {
-        return this.page.locator('.MuiBadge-badge.MuiBadge-colorError');
+        return this.page.locator('[class*="MuiBadge-badge"][class*="colorError"]');
     }
 
     /**
      * Get the Error badge (warning) on canvas — appears when condition evaluation fails.
      */
     getCanvasErrorBadge(): Locator {
-        return this.page.locator('.MuiBadge-badge.MuiBadge-colorWarning');
+        return this.page.locator('[class*="MuiBadge-badge"][class*="colorWarning"]');
     }
 
     // ── Canvas elements ──────────────────────────────────────────────────
@@ -408,7 +408,7 @@ export class MultipathComponent {
      * "Continue from here" text below the IF block on canvas.
      */
     getContinueFromHereText(): Locator {
-        return this.page.locator('text=Continue from here');
+        return this.page.getByText('Continue from here', { exact: true });
     }
 
     /**
@@ -416,14 +416,14 @@ export class MultipathComponent {
      * Only visible for ACTIVE paths (not DRAFTED).
      */
     getAddStepInsidePath(): Locator {
-        return this.page.locator('text=Add or drag step here');
+        return this.page.getByText('Add or drag step here', { exact: true });
     }
 
     /**
      * Get Else node text on canvas (paragraph, not h6 which is the panel accordion).
      */
     getCanvasElseNode(): Locator {
-        return this.page.locator('p:text-is("Else")');
+        return this.page.locator('p').filter({ hasText: /^Else$/ }).first();
     }
 
     /**
@@ -447,7 +447,7 @@ export class MultipathComponent {
      * Rendered as <Typography class="break-all" variant="body1">true</Typography>.
      */
     getEvaluationResult(): Locator {
-        return this.page.locator('p.break-all');
+        return this.page.locator('p[class*="break-all"]');
     }
 
     // ── Save button inspection ──────────────────────────────────────────────
@@ -477,7 +477,7 @@ export class MultipathComponent {
      * After save, the node text changes from "Path N" to the condition statement.
      */
     getCanvasPathText(text: string): Locator {
-        return this.page.locator(`p:text-is("${text}")`);
+        return this.page.locator('p').filter({ hasText: new RegExp(`^${text}$`) }).first();
     }
 
     // ── Three-dot menu with hover ───────────────────────────────────────────
@@ -488,7 +488,7 @@ export class MultipathComponent {
      * @param pathText The text on the canvas node to hover (e.g. "Path 1", "true").
      */
     async hoverAndClickActionsMenu(pathText: string): Promise<void> {
-        const pathNode = this.page.locator(`p:text-is("${pathText}")`).first();
+        const pathNode = this.page.locator('p').filter({ hasText: new RegExp(`^${pathText}$`) }).first();
         // Hover the parent box to trigger CSS :hover → opacity:1
         const parentBox = pathNode.locator('xpath=ancestor::div[contains(@class,"p-2")]').first();
         await parentBox.hover();
@@ -514,28 +514,28 @@ export class MultipathComponent {
      * Click a path node on the canvas to open/reopen the slider.
      */
     async clickCanvasPathNode(text: string): Promise<void> {
-        await this.page.locator(`p:text-is("${text}")`).first().click();
+        await this.page.locator('p').filter({ hasText: new RegExp(`^${text}$`) }).first().click();
     }
 
     /**
      * Click the canvas "Path N" node — uses paragraph element on canvas.
      */
     async clickCanvasPath(pathNumber: number): Promise<void> {
-        await this.page.locator(`p:text-is("Path ${pathNumber}")`).first().click();
+        await this.page.locator('p').filter({ hasText: new RegExp(`^Path ${pathNumber}$`) }).first().click();
     }
 
     /**
      * Click the Else node on the canvas.
      */
     async clickCanvasElseNode(): Promise<void> {
-        await this.page.locator('p:text-is("Else")').first().click();
+        await this.page.locator('p').filter({ hasText: /^Else$/ }).first().click();
     }
 
     /**
      * Get the canvas IF node button.
      */
     getCanvasIfButton(): Locator {
-        return this.page.locator('button:text-is("IF")');
+        return this.page.locator('button').filter({ hasText: /^IF$/ }).first();
     }
 
     // ── Reopen panel ───────────────────────────────────────────────────────
@@ -550,7 +550,7 @@ export class MultipathComponent {
         let clicked = false;
         if (conditionText) {
             // Try exact text match first (works when AI doesn't rename)
-            const node = this.page.locator(`p:text-is("${conditionText}")`).first();
+            const node = this.page.locator('p').filter({ hasText: new RegExp(`^${conditionText}$`) }).first();
             try {
                 await node.click({ timeout: 3000 });
                 clicked = true;
@@ -560,10 +560,10 @@ export class MultipathComponent {
         }
         if (!clicked) {
             // Fallback: click the IF canvas node which always opens the multipath panel
-            await this.page.locator('button:text-is("IF")').click({ timeout: 5000 });
+            await this.getCanvasIfButton().click({ timeout: 5000 });
             // IF button opens at switchParent level — all accordions collapsed.
             // Wait for panel header, then expand the first accordion.
-            await this.page.locator('h5:text-is("MultiPath")').waitFor({ state: 'visible', timeout: 5000 });
+            await this.panelHeading.waitFor({ state: 'visible', timeout: 5000 });
             await this.page.waitForTimeout(300);
             // Click the first accordion button (has aria-expanded attribute)
             await this.page.evaluate(() => {
@@ -611,7 +611,7 @@ export class MultipathComponent {
             await this.fillCondition(text);
             await this.save();
             try {
-                await this.page.locator('h5:text-is("MultiPath")').waitFor({ state: 'hidden', timeout: 8000 });
+                await this.panelHeading.waitFor({ state: 'hidden', timeout: 8000 });
                 await this.page.waitForTimeout(500);
                 return;
             } catch {
@@ -630,7 +630,7 @@ export class MultipathComponent {
             await this.save();
             // Verify save: panel should close after successful save
             try {
-                await this.page.locator('h5:text-is("MultiPath")').waitFor({ state: 'hidden', timeout: 8000 });
+                await this.panelHeading.waitFor({ state: 'hidden', timeout: 8000 });
                 // Save succeeded — panel closed
                 await this.page.waitForTimeout(500);
                 await this.reopenPanelAfterSave(text);
