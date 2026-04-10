@@ -34,7 +34,7 @@ export class JSCodeComponent {
     readonly addVariableBtn: Locator;           // data-test-id='add-variable-btn'
     readonly variableNameInput: Locator;        // data-testid='variable-name-input'
     readonly addVariableConfirmBtn: Locator;    // data-test-id='add-variable-confirm-btn'
-    readonly cancelVariableBtn: Locator;        // role='button' name='Cancel'
+    readonly cancelVariableBtn: Locator;        // data-testid='cancel-add-btn'
 
     // Code accordion (role='button' name='Code' / #code-editor)
     readonly codeAccordionBtn: Locator;
@@ -44,14 +44,46 @@ export class JSCodeComponent {
     // Save (data-testid='save-button')
     readonly saveButton: Locator;
 
+    // Variable popover close button (data-testid='variable-popover-close-button')
+    readonly variablePopoverCloseButton: Locator;
+
+    // Ask AI button inside the JS Code description section (data-testid='ask-ai-description-button' if available, else scoped role)
+    readonly askAiDescriptionButton: Locator;
+
     // Canvas — step node labels after saving
     readonly jsCodeStepNode: Locator;           // getByText('JS_Code')
     readonly configureStepNode: Locator;        // getByText('Configure')
 
+    // ── Ask AI (canvas button) ───────────────────────────────────────────────
+    readonly askAiCanvasButton: Locator;        // data-testid='ask-ai-button'
+    readonly chatbotChangesAppliedLink: Locator; // data-testid='chatbot-changes-applied-link'
+    readonly inputVariablesCloseBtn: Locator;   // data-testid='input-variables-close-btn'
+    readonly dryRunTestFlowButton: Locator;      // data-testid='dry-run-test-flow-button' (inside dry-run panel)
+    readonly bodyInsertExpandButton: Locator;   // expand icon inside 'body' treeitem
+    readonly bodyInsertButton: Locator;         // 'Insert' button inside 'body' treeitem
+    readonly queryInsertExpandButton: Locator;  // expand icon inside 'query' treeitem
+    readonly chatbotMessageInput: Locator;      // data-testid='chatbot-message-input'
+    readonly chatbotSendButton: Locator;        // data-testid='chatbot-send-button'
+
+    // ── Navigation / project setup (TC-001 raw) ────────────────────────────────
+    readonly createFlowButton: Locator;         // data-testid='project-slider-create-flow-btn'
+    readonly webhookTriggerOption: Locator;     // getByText('When a webhook is triggered')
+
     // ── Add-step flow ──────────────────────────────────────────────────────────
     readonly addStepButton: Locator;            // data-testid='add-step-button'
-    readonly jsCodeOption: Locator;             // role='option' name='JS Code'
-    readonly closeOverlayButton: Locator;       // icon-only button that closes add-step overlay
+    readonly jsCodeOption: Locator;             // role='option' name='JS Code' exact
+    readonly jsCodeOptionByLabel: Locator;      // getByLabel('JS CodeRun custom task, logic').getByText('JS Code')
+    readonly closeOverlayButton: Locator;       // data-testid='slider-back-button'
+
+    // ── Variable value inputs (inside input-values-accordion) ─────────────────
+    readonly variableValueTextbox: Locator;     // first textbox inside input-values-accordion
+    readonly variableValueTextarea: Locator;    // textarea inside input-values-accordion
+    readonly muiBackdrop: Locator;              // MUI Backdrop — scoped to [role="presentation"]
+    readonly addCancelText: Locator;            // getByText('AddCancel') — text stable for combined button label
+    readonly duplicateVariableError: Locator;   // getByText('A variable with this name already exists.')
+
+    // ── Code editor — empty textbox filter (TC-003 raw) ──────────────────────
+    readonly codeEditorEmptyTextbox: Locator;   // #code-editor textbox with no content
 
     constructor(page: Page) {
         this.page = page;
@@ -71,27 +103,59 @@ export class JSCodeComponent {
         // Input Values accordion
         this.inputValuesAccordionSummary = page.getByTestId('input-values-accordion-summary');
         this.inputValuesAccordion = page.getByTestId('input-values-accordion');
-        this.addVariableBtn = page.locator('[data-test-id="add-variable-btn"]');
+        this.addVariableBtn = page.getByTestId('add-variable-btn');
         this.variableNameInput = page.getByTestId('variable-name-input');
-        this.addVariableConfirmBtn = page.locator('[data-test-id="add-variable-confirm-btn"]');
-        this.cancelVariableBtn = page.getByRole('button', { name: 'Cancel' });
+        this.addVariableConfirmBtn = page.getByTestId('add-variable-confirm-btn');
+        this.cancelVariableBtn = page.getByTestId('cancel-add-btn');
 
-        // Code accordion
-        this.codeAccordionBtn = page.getByRole('button', { name: 'Code' });
+        // Code accordion — AccordionSummary has no testid; scope by #code-editor ID then role
+        this.codeAccordionBtn = page.locator('#code-editor [role="button"]').first();
         this.codeEditor = page.locator('#code-editor');
         this.codeEditorTextbox = page.locator('#code-editor').getByRole('textbox').first();
 
         // Save
         this.saveButton = page.getByTestId('save-button');
 
-        // Canvas step nodes
-        this.jsCodeStepNode = page.getByText('JS_Code');
-        this.configureStepNode = page.getByText('Configure');
+        // Variable popover close button
+        this.variablePopoverCloseButton = page.getByTestId('variable-popover-close-button');
+
+        // Ask AI button in description area — scoped to the description box container
+        this.askAiDescriptionButton = page.locator('[data-testid="ask-ai-button"]').nth(1);
+
+        // Canvas step nodes — no testid available; scoped to canvas step text nodes
+        this.jsCodeStepNode = page.locator('p').filter({ hasText: /^JS_Code$/ }).first();
+        this.configureStepNode = page.locator('p').filter({ hasText: /^Configure$/ }).first();
+
+        // Ask AI canvas + chatbot
+        this.askAiCanvasButton = page.getByTestId('ask-ai-button');
+        this.chatbotChangesAppliedLink = page.getByTestId('chatbot-changes-applied-link');
+        this.inputVariablesCloseBtn = page.getByTestId('input-variables-close-btn');
+        this.dryRunTestFlowButton = page.getByTestId('dry-run-test-flow-button');
+        this.bodyInsertExpandButton = page.locator('[role="treeitem"]').filter({ hasText: /^body/ }).locator('button').first();
+        this.bodyInsertButton = page.locator('[role="treeitem"]').filter({ hasText: /^body/ }).getByRole('button', { name: 'Insert' });
+        this.queryInsertExpandButton = page.locator('[role="treeitem"]').filter({ hasText: /^query/ }).locator('button').first();
+        this.chatbotMessageInput = page.getByTestId('chatbot-message-input');
+        this.chatbotSendButton = page.getByTestId('chatbot-send-button');
+
+        // Navigation / project setup
+        this.createFlowButton = page.getByTestId('project-slider-create-flow-btn');
+        this.webhookTriggerOption = page.getByText('When a webhook is triggered');
 
         // Add-step flow
         this.addStepButton = page.getByTestId('add-step-button');
         this.jsCodeOption = page.getByRole('option', { name: 'JS Code', exact: true });
-        this.closeOverlayButton = page.getByRole('button').filter({ hasText: /^$/ }).first();
+        this.jsCodeOptionByLabel = page.getByLabel('JS CodeRun custom task, logic').getByText('JS Code');
+        this.closeOverlayButton = page.getByTestId('slider-back-button');
+
+        // Variable value inputs
+        this.variableValueTextbox = page.getByTestId('input-values-accordion').getByRole('textbox');
+        this.variableValueTextarea = page.getByTestId('input-values-accordion').locator('textarea');
+        this.muiBackdrop = page.locator('[role="presentation"] .MuiBackdrop-root').first();
+        this.addCancelText = page.getByText('AddCancel', { exact: true });
+        this.duplicateVariableError = page.getByText('A variable with this name already exists.');
+
+        // Code editor empty textbox
+        this.codeEditorEmptyTextbox = page.locator('#code-editor').getByRole('textbox').filter({ hasText: /^$/ });
     }
 
     // ── Actions menu ──────────────────────────────────────────────────────────
@@ -139,7 +203,7 @@ export class JSCodeComponent {
     }
 
     async clickAddVariable(): Promise<void> {
-        await this.addVariableBtn.click();
+        await this.addVariableBtn.click({ force: true });
     }
 
     async fillVariableName(name: string): Promise<void> {
@@ -183,9 +247,11 @@ export class JSCodeComponent {
     }
 
     async fillCode(code: string): Promise<void> {
-        const emptyTextbox = this.codeEditor.getByRole('textbox').filter({ hasText: /^$/ });
-        await emptyTextbox.click();
-        await emptyTextbox.fill(code);
+        const textbox = this.codeEditor.getByRole('textbox').first();
+        await textbox.waitFor({ state: 'visible' });
+        await textbox.click();
+        await this.page.keyboard.press('Control+a');
+        await this.page.keyboard.type(code);
     }
 
     async overwriteCode(code: string): Promise<void> {
@@ -204,6 +270,18 @@ export class JSCodeComponent {
         await this.codeEditorTextbox.click();
         await this.page.keyboard.press('Control+a');
         await this.page.keyboard.press('Delete');
+    }
+
+    // ── Variable popover ──────────────────────────────────────────────────────
+
+    async closeVariablePopover(): Promise<void> {
+        await this.variablePopoverCloseButton.click();
+    }
+
+    // ── Ask AI (description area) ─────────────────────────────────────────────
+
+    async clickAskAiDescriptionButton(): Promise<void> {
+        await this.askAiDescriptionButton.click();
     }
 
     // ── Save ─────────────────────────────────────────────────────────────────
@@ -233,7 +311,92 @@ export class JSCodeComponent {
         await this.jsCodeOption.click();
     }
 
+    async selectJsCodeOptionByLabel(): Promise<void> {
+        await this.jsCodeOptionByLabel.click();
+    }
+
     async closeAddStepOverlay(): Promise<void> {
         await this.closeOverlayButton.click();
+    }
+
+    // ── Navigation / project setup ────────────────────────────────────────────
+
+    async clickCreateFlowButton(): Promise<void> {
+        await this.createFlowButton.waitFor({ state: 'visible', timeout: 60000 });
+        await this.createFlowButton.click();
+    }
+
+    async selectWebhookTriggerOption(): Promise<void> {
+        await this.webhookTriggerOption.click();
+    }
+
+    // ── Variable value inputs ─────────────────────────────────────────────────
+
+    async clickVariableValueTextbox(): Promise<void> {
+        await this.variableValueTextbox.click();
+    }
+
+    async fillVariableValueTextarea(value: string): Promise<void> {
+        await this.variableValueTextarea.fill(value);
+    }
+
+    async fillVariableValueTextbox(value: string): Promise<void> {
+        await this.variableValueTextbox.fill(value);
+    }
+
+    async clickMuiBackdrop(): Promise<void> {
+        await this.muiBackdrop.click();
+    }
+
+    async clickAddCancelText(): Promise<void> {
+        await this.addCancelText.click();
+    }
+
+    // ── Code editor ───────────────────────────────────────────────────────────
+
+    async clickCodeEditorEmptyTextbox(): Promise<void> {
+        await this.codeEditorEmptyTextbox.click();
+    }
+
+    async fillCodeEditorEmptyTextbox(code: string): Promise<void> {
+        await this.codeEditorEmptyTextbox.fill(code);
+    }
+
+    variableAutoSuggest(name: string): import('@playwright/test').Locator {
+        return this.page.getByText(name);
+    }
+
+    // ── Ask AI canvas / chatbot ───────────────────────────────────────────────
+
+    async clickAskAiCanvasButton(): Promise<void> {
+        await this.askAiCanvasButton.click();
+    }
+
+    async pressEnterChatbot(): Promise<void> {
+        await this.chatbotMessageInput.press('Enter');
+    }
+
+    async clickChatbotChangesApplied(): Promise<void> {
+        await this.chatbotChangesAppliedLink.click();
+    }
+
+    async clickInputVariablesClose(): Promise<void> {
+        await this.inputVariablesCloseBtn.click();
+    }
+
+    async clickDryRunTestFlowButton(): Promise<void> {
+        await this.dryRunTestFlowButton.click();
+    }
+
+    async clickBodyInsertExpand(): Promise<void> {
+        await this.bodyInsertExpandButton.click();
+    }
+
+    async clickBodyInsert(): Promise<void> {
+        await this.bodyInsertButton.click();
+    }
+
+    async clickQueryInsertExpand(): Promise<void> {
+        await this.queryInsertExpandButton.click();
     }
 }

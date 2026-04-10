@@ -7,6 +7,7 @@ import { HttpApiRequestComponent } from '../../components/workflow/http-api-requ
 import { AskAIModal } from '../../modals/ask-ai.modal';
 import { MultipathComponent } from '../../components/workflow/multipath.component';
 import { DelayComponent } from '../../components/workflow/delay.component';
+import { ThreeDotsMenuComponent } from '../../components/workflow/three-dots-menu.component';
 
 /**
  * Workflow Page
@@ -25,6 +26,7 @@ export class WorkflowPage {
     readonly askAI: AskAIModal;
     readonly multipath: MultipathComponent;
     readonly delay: DelayComponent;
+    readonly threeDotsMenu: ThreeDotsMenuComponent;
 
     // Page-unique locators
     readonly flowTitleInput: Locator;
@@ -114,6 +116,7 @@ export class WorkflowPage {
         this.askAI = new AskAIModal(page);
         this.multipath = new MultipathComponent(page);
         this.delay = new DelayComponent(page);
+        this.threeDotsMenu = new ThreeDotsMenuComponent(page);
 
         // Page-unique locators
         this.flowTitleInput = page.locator('#flow-title-textfield');

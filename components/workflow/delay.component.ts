@@ -65,42 +65,40 @@ export class DelayComponent {
         this.addStepButton = page.getByTestId('add-step-button');
         this.delayOption = page.getByTestId('builtin-tool-option')
             .filter({ hasText: 'Delay' });
-        this.closeOverlayButton = page.getByRole('button').filter({ hasText: /^$/ }).first();
+        this.closeOverlayButton = page.getByTestId('slider-back-button');
 
-        // Panel header — step name input shows "Wait" (rendered as textbox "Plugin Name")
+        // Panel header — step name input has id='function-title-textfield' (stable ID)
         this.panelHeading = page.locator('#function-title-textfield');
         this.changeButton = page.getByTestId('step-change-button');
-        this.closeButton = page.locator('button').filter({ hasText: /^$/ }).last();
+        this.closeButton = page.getByTestId('slider-close-button');
 
         // Delay input — MentionsInput textarea with placeholder
         this.delayInput = page.getByPlaceholder('e.g. Delay of 15 minutes');
-        this.delayLabel = page.locator('text=Enter Delay statement here');
+        this.delayLabel = page.getByText('Enter Delay statement here', { exact: true });
 
-        // AI Preview toggle ("Check AI response" label in DOM)
-        this.aiPreviewToggle = page.locator('span.MuiSwitch-root').first();
-        this.aiPreviewLabel = page.locator('text=Check AI response');
+        // AI Preview toggle — no testid; target the switch input's parent label by its text
+        this.aiPreviewToggle = page.locator('label').filter({ hasText: 'Check AI response' }).locator('span[role="checkbox"], input[type="checkbox"]').first();
+        this.aiPreviewLabel = page.getByText('Check AI response', { exact: true });
 
-        // Field mapping & AI submit
-        // Field mapping button ("Click for Field Mapping" in DOM)
-        this.fieldMappingButton = page.locator('button').filter({ hasText: /Field Mapping/ });
+        // Field mapping button — aria-label based (no testid available)
+        this.fieldMappingButton = page.locator('button[aria-label="Click for Field Mapping"]');
 
-        // AI submit button — MUI Fab with ArrowUpward icon, appears when input has text
-        this.submitAiButton = page.locator('.MuiFab-root').first();
+        // AI submit button — Fab with ArrowUpward icon; target by aria-label or role=button with title
+        this.submitAiButton = page.locator('button[aria-label="submit"]').or(page.locator('[role="button"][title="submit"]')).first();
 
         // Footer buttons
         this.testButton = page.getByTestId('dry-run-test-button');
         this.saveButton = page.getByTestId('save-button');
 
-        // Error text
-        this.emptyFieldError = page.locator("text=This field can't be empty.");
+        // Error text — no testid; stable by exact text content
+        this.emptyFieldError = page.getByText("This field can't be empty.", { exact: true });
 
-        // Help button
-        this.helpButton = page.locator('text=Help');
+        // Help button — no testid; exact text match
+        this.helpButton = page.getByText('Help', { exact: true });
 
-        // Canvas nodes — delay step renders inside a StepNode with class step-draggable-container.
-        // Filter by 'Wait' text to distinguish from trigger node which also uses this class.
-        this.canvasWaitNode = page.locator('.step-draggable-container').filter({ hasText: 'Wait' }).first();
-        this.unsavedChangesChip = page.locator('text=Unsaved Changes');
+        // Canvas nodes — no testid on canvas step nodes; scoped to paragraph text
+        this.canvasWaitNode = page.locator('p').filter({ hasText: /^Wait$/ }).first();
+        this.unsavedChangesChip = page.getByText('Unsaved Changes', { exact: true });
 
         // Response section (appears after TEST)
         this.responseSection = page.getByTestId('dry-run-expand-response');
@@ -459,8 +457,8 @@ export class DelayComponent {
             try {
                 await this.canvasWaitNode.click({ force: true, timeout: 5000 });
             } catch {
-                // Last resort: Playwright text locator
-                const waitText = this.page.locator('text=Wait').first();
+                // Last resort: stable getByText fallback
+                const waitText = this.page.getByText('Wait', { exact: true }).first();
                 await waitText.click({ force: true, timeout: 5000 }).catch(() => {});
             }
             await this.page.waitForTimeout(1000);

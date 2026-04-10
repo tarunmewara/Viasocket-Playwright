@@ -50,12 +50,12 @@ export class SidepanelComponent {
         this.sliderToggleButton = page.getByTestId('project-slider-toggle-button');
         this.advancedMenuButton = page.getByTestId('project-slider-advanced-menu-button');
 
-        // Role/text based locators (no data-testid in source)
-        this.homeLink = page.getByRole('link', { name: 'Home' });
-        this.searchLink = page.getByRole('button', { name: /Search/ });
-        this.connectionsLink = page.getByRole('link', { name: 'Connections' });
-        this.templatesLink = page.getByRole('link', { name: 'Templates' });
-        this.expertsLiveLink = page.getByRole('link', { name: 'Experts are live' });
+        // No data-testid in source for these items; use role + exact text (most stable without testid)
+        this.homeLink = page.getByRole('link', { name: 'Home', exact: true });
+        this.searchLink = page.getByRole('button', { name: /Search \(/ });
+        this.connectionsLink = page.getByRole('link', { name: 'Connections', exact: true });
+        this.templatesLink = page.getByRole('link', { name: 'Templates', exact: true });
+        this.expertsLiveLink = page.getByRole('link', { name: 'Experts are live', exact: true });
     }
 
     async clickCreateNewFlow(): Promise<void> {
