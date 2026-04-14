@@ -8,6 +8,10 @@ import { AskAIModal } from '../../modals/ask-ai.modal';
 import { MultipathComponent } from '../../components/workflow/multipath.component';
 import { DelayComponent } from '../../components/workflow/delay.component';
 import { ThreeDotsMenuComponent } from '../../components/workflow/three-dots-menu.component';
+import { AddStepComponent } from '../../components/workflow/add-step.component';
+import { GmailComponent } from '../../components/workflow/gmail.component';
+import { GoogleSheetsComponent } from '../../components/workflow/google-sheets.component';
+import { AIAgentComponent } from '../../components/workflow/ai-agent.component';
 
 /**
  * Workflow Page
@@ -27,6 +31,10 @@ export class WorkflowPage {
     readonly multipath: MultipathComponent;
     readonly delay: DelayComponent;
     readonly threeDotsMenu: ThreeDotsMenuComponent;
+    readonly addStep: AddStepComponent;
+    readonly gmail: GmailComponent;
+    readonly googleSheets: GoogleSheetsComponent;
+    readonly aiAgent: AIAgentComponent;
 
     // Page-unique locators
     readonly flowTitleInput: Locator;
@@ -117,6 +125,10 @@ export class WorkflowPage {
         this.multipath = new MultipathComponent(page);
         this.delay = new DelayComponent(page);
         this.threeDotsMenu = new ThreeDotsMenuComponent(page);
+        this.addStep = new AddStepComponent(page);
+        this.gmail = new GmailComponent(page);
+        this.googleSheets = new GoogleSheetsComponent(page);
+        this.aiAgent = new AIAgentComponent(page);
 
         // Page-unique locators
         this.flowTitleInput = page.locator('#flow-title-textfield');

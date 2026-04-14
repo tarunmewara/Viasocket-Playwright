@@ -108,10 +108,10 @@ export class JSCodeComponent {
         this.addVariableConfirmBtn = page.getByTestId('add-variable-confirm-btn');
         this.cancelVariableBtn = page.getByTestId('cancel-add-btn');
 
-        // Code accordion — AccordionSummary has no testid; scope by #code-editor ID then role
-        this.codeAccordionBtn = page.locator('#code-editor [role="button"]').first();
+        // Code accordion — use testid from working test
+        this.codeAccordionBtn = page.getByTestId('code-accordion-summary');
         this.codeEditor = page.locator('#code-editor');
-        this.codeEditorTextbox = page.locator('#code-editor').getByRole('textbox').first();
+        this.codeEditorTextbox = page.locator('#code-editor').getByRole('textbox');
 
         // Save
         this.saveButton = page.getByTestId('save-button');
