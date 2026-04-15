@@ -99,12 +99,12 @@ test.describe('Webhook Flow', () => {
     await page.getByTestId('add-step-button').waitFor({ state: 'visible', timeout: 15000 });
 
     // ── Step 2: Click Add Step on the canvas ────────────────────────────────
-    // data-testid='add-step-button' (canvas Add Step node)
+    // data-testid='add-step-button' (canvas)
     await page.getByTestId('add-step-button').click();
 
     // ── Step 3: Select JS Code from the Add Step panel ──────────────────────
-    // role='option' with name matching 'JS Code Run custom task,' (AddStepSearchView.tsx)
-    await page.getByRole('option', { name: /JS Code/i }).first().click();
+    // data-testid='builtin-tool-option' (AddStepSearchView.tsx line 434), filtered by text
+    await page.getByTestId('builtin-tool-option').filter({ hasText: /JS Code/i }).first().click();
 
     // ── Step 4: Close the variable popover that opens automatically ──────────
     // data-testid='variable-popover-close-button' (VariablePopoverMenu.tsx line 484)
@@ -136,7 +136,7 @@ test.describe('Webhook Flow', () => {
     }
 
     // ── Step 10: Save the JS Code step ──────────────────────────────────────
-    // data-testid='save-button' (saveButtonV3.tsx line 579)
+    // data-testid='save-button' (saveButtonV3.tsx)
     await page.getByTestId('save-button').click();
 
     console.log('✅ JS Code step added, AI prompted, tested and saved');
@@ -154,8 +154,8 @@ test.describe('Webhook Flow', () => {
     await page.getByTestId('add-step-button').click();
 
     // ── Step 3: Select Multiple Paths (If Conditions) ────────────────────────
-    // role='option' filtered by name — no data-testid on options (AddStepSearchView.tsx)
-    await page.getByRole('option', { name: /Multiple Paths/i }).first().click();
+    // data-testid='builtin-tool-option' (AddStepSearchView.tsx line 434), filtered by text
+    await page.getByTestId('builtin-tool-option').filter({ hasText: /Multiple Paths/i }).first().click();
 
     // ── Step 4: Close the variable popover that opens automatically ──────────
     // data-testid='variable-popover-close-button' (VariablePopoverMenu.tsx line 484)
@@ -180,14 +180,13 @@ test.describe('Webhook Flow', () => {
     await page.getByTestId('trigger-search-input').fill('slack');
 
     // ── Step 8: Select the Slack option from results ─────────────────────────
-    // ListItemButton with ListItemText primary=service_name (ConnectedAppsRenderer.tsx)
-    // No aria-label — use role='option' filtered by exact name 'Slack'
+    // Search renders results as Autocomplete options (role='option'), not ConnectedAppsRenderer items
     await page.getByRole('option', { name: /^Slack$/i }).click();
 
     // ── Step 8b: Select 'Send Message' action from the Slack actions list ────
     // After selecting Slack app, the action list opens — must pick an action first
-    // No data-testid on action list items — stable text selector
-    await page.getByText('Send Message').first().click();
+    // data-testid='trigger-action-item' (ActionsListAutocomplete.tsx line 200), filtered by text
+    await page.getByTestId('trigger-action-item').filter({ hasText: 'Send Message' }).first().click();
 
     // ── Step 9: Click auth connection chip to connect Slack account ──────────
     // data-testid='auth-connection-chip' (BasicAndAuth2.tsx line 640)
@@ -196,23 +195,32 @@ test.describe('Webhook Flow', () => {
     // ── Step 10: Select the existing Slack connection ───────────────────────
     // Text 'something' is the existing connection label — no data-testid on connection list items
     await page.getByText('something').click();
+    // Wait for the plugin form to reload with fields after connection is selected
+    await page.waitForTimeout(3000);
 
-    // ── Step 11: Click 'Select Slack channel(s)' button to open channel picker
-    // role=button with name — no data-testid on this Slack field button
-    await page.getByRole('button', { name: 'Select Slack channel(s)' }).click();
+    // ── Step 11: Click 'Select Slack channel(s)' button inside channel_id field ──
+    // Scope to plugin-field-channel_id to avoid ambiguity; wait for button to be visible
+    await page.getByTestId('plugin-field-channel_id').getByRole('button', { name: 'Select Slack channel(s)' }).click();
 
-    // ── Step 12: Select the Slack channel ───────────────────────────────────
-    // Text match for the channel option — no data-testid on dropdown items
+    // ── Step 12: Wait for the channel dropdown and select the channel ─────────
+    await page.getByText('fraud-review (C0AQTGJ23DM)').waitFor({ state: 'visible', timeout: 10000 });
     await page.getByText('fraud-review (C0AQTGJ23DM)').click();
 
-    // ── Step 13: Click inside the channel_id field scroll area to confirm selection
-    // #scroll-channel_id is the plugin-rendered field container — use stable locator scoped by field label
-    await page.locator('#scroll-channel_id').click();
+    // ── Step 13: Click outside the dropdown to close it and confirm channel ───
+    // Click on the plugin-field-content area to dismiss the channel picker
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(1000);
 
-    // ── Step 14: Click the message textbox and close variable popover ────────
-    await page.getByRole('textbox', { name: /Type your message/i }).click();
+    // ── Step 14: Click the Message Content field and close variable popover ──
+    // data-testid='plugin-field-content' (pluginHocV2.tsx line 592) — confirmed from DOM snapshot
+    await page.getByTestId('plugin-field-content').getByRole('textbox').click();
     // data-testid='variable-popover-close-button' (VariablePopoverMenu.tsx line 484)
     await page.getByTestId('variable-popover-close-button').click();
+
+    // ── Step 14b: Fill the message content ───────────────────────────────────
+    await page.getByTestId('plugin-field-content').getByRole('textbox').fill(
+      'Order Alert: orderId amount paymentMethod'
+    );
 
     // ── Step 15: Test the Slack step (dry run) ───────────────────────────────
     // data-testid='dry-run-test-button' (pluginButton/dryRunButton.tsx line 177)
@@ -224,6 +232,7 @@ test.describe('Webhook Flow', () => {
 
     console.log('✅ Multiple Paths added, Slack step configured in first branch, tested and saved');
   });
+
   test('TC-WF-005: Add API Call step, open API Editor, fill URL, test and save', async ({ page }) => {
 
     // ── Step 1: Navigate to the SAME flow created in TC-WF-001 ─────────────
@@ -231,18 +240,25 @@ test.describe('Webhook Flow', () => {
     await page.goto(storedFlowPageUrl);
     await page.getByTestId('add-step-button').waitFor({ state: 'visible', timeout: 15000 });
 
+    // ── Step 1b: Dismiss Flow Document popover if present ────────────────────
+    // The popover intercepts pointer events on the canvas — dismiss before interacting
+    const closePopover5 = page.getByRole('button', { name: '× Close' });
+    if (await closePopover5.isVisible({ timeout: 3000 }).catch(() => false)) {
+      await closePopover5.click();
+    }
+
     // ── Step 2: Click Add Step on the canvas ────────────────────────────────
     // data-testid='add-step-button' (canvas)
     await page.getByTestId('add-step-button').click();
 
     // ── Step 3: Select API Call from the Add Step panel ──────────────────────
-    // role='option' filtered by name — no data-testid on options (AddStepSearchView.tsx)
-    await page.getByRole('option', { name: /API Call/i }).first().click();
+    // data-testid='builtin-tool-option' (AddStepSearchView.tsx line 434), filtered by text
+    await page.getByTestId('builtin-tool-option').filter({ hasText: /API Call/i }).first().click();
 
     // ── Step 4: Open the API Editor accordion ────────────────────────────────
-    // AccordionSummary id='panel1a-header' in apiSliderV2.tsx — no data-testid
+    // data-testid='api-slider-editor-accordion-summary' (apiSliderV2.tsx line 144)
     // Use force:true to bypass any overlay interception
-    await page.locator('#panel1a-header').click({ force: true });
+    await page.getByTestId('api-slider-editor-accordion-summary').click({ force: true });
 
     // ── Step 5: Fill the URL input field ─────────────────────────────────────
     // placeholder='https://flow.viasocket.com/' (apiInputField.tsx line 108)
@@ -277,13 +293,18 @@ test.describe('Webhook Flow', () => {
     console.log('✅ API Call step added, API Editor opened, URL filled, tested and saved');
   });
 
-
   test('TC-WF-006: Add Memory step, create a record with JSON data, test and save', async ({ page }) => {
 
     // ── Step 1: Navigate to the SAME flow created in TC-WF-001 ─────────────
     expect(storedFlowPageUrl, 'Flow page URL must be stored by TC-WF-001 before this test runs').toBeTruthy();
     await page.goto(storedFlowPageUrl);
     await page.getByTestId('add-step-button').waitFor({ state: 'visible', timeout: 15000 });
+
+    // ── Step 1b: Dismiss Flow Document popover if present ────────────────────
+    const closePopover6 = page.getByRole('button', { name: '× Close' });
+    if (await closePopover6.isVisible({ timeout: 3000 }).catch(() => false)) {
+      await closePopover6.click();
+    }
 
     // ── Step 2: Click Add Step on the canvas ────────────────────────────────
     await page.getByTestId('add-step-button').click();
@@ -293,11 +314,13 @@ test.describe('Webhook Flow', () => {
     await page.getByTestId('trigger-search-input').fill('memory');
 
     // ── Step 4: Select the Memory app from search results ────────────────────
-    // ListItemButton with ListItemText primary=service_name (ConnectedAppsRenderer.tsx)
+    // data-testid='connectedApp-memory' (ConnectedAppsRenderer.tsx line 44)
+    // Search renders results as Autocomplete options (role='option'), not ConnectedAppsRenderer items
     await page.getByRole('option', { name: /^Memory$/i }).click();
 
     // ── Step 5: Select 'Create a record' action ───────────────────────────────
-    await page.getByRole('option', { name: /Create a record/i }).first().click();
+    // data-testid='trigger-action-item' (ActionsListAutocomplete.tsx line 200), filtered by text
+    await page.getByTestId('trigger-action-item').filter({ hasText: /Create a record/i }).first().click();
 
     // ── Step 6: Click auth connection chip ───────────────────────────────────
     // data-testid='auth-connection-chip' (BasicAndAuth2.tsx)
@@ -313,15 +336,15 @@ test.describe('Webhook Flow', () => {
     await page.getByRole('option', { name: 'JSON' }).click();
 
     // ── Step 10: Click the JSON string textbox ───────────────────────────────
-    // #scroll-json_string is the plugin-rendered field container
-    await page.locator('#scroll-json_string').getByRole('textbox').click();
+    // data-testid='plugin-field-json_string' (pluginHocV2.tsx line 592)
+    await page.getByTestId('plugin-field-json_string').getByRole('textbox').click();
 
     // ── Step 11: Close the variable popover ──────────────────────────────────
     // data-testid='variable-popover-close-button' (VariablePopoverMenu.tsx)
     await page.getByTestId('variable-popover-close-button').click();
 
     // ── Step 12: Fill the JSON string field ──────────────────────────────────
-    await page.locator('#scroll-json_string').getByRole('textbox').fill(
+    await page.getByTestId('plugin-field-json_string').getByRole('textbox').fill(
       '{\n  "orderId": "body.\\"orderId\\"",\n  "userId": "body.\\"userId\\"",\n  "amount": "body.\\"amount\\"",\n  "riskScore": "order_risk_assessment.normalizedOrder.riskScore",\n  "status": "processed"\n}'
     );
 
@@ -343,7 +366,6 @@ test.describe('Webhook Flow', () => {
     console.log('✅ Memory step added, Create a record with JSON data, tested and saved');
   });
 
-
   test('TC-WF-007: Add Call AI Agent step, fill prompt, test and save', async ({ page }) => {
 
     // ── Step 1: Navigate to the SAME flow created in TC-WF-001 ─────────────
@@ -351,12 +373,18 @@ test.describe('Webhook Flow', () => {
     await page.goto(storedFlowPageUrl);
     await page.getByTestId('add-step-button').waitFor({ state: 'visible', timeout: 15000 });
 
+    // ── Step 1b: Dismiss Flow Document popover if present ────────────────────
+    const closePopover7 = page.getByRole('button', { name: '× Close' });
+    if (await closePopover7.isVisible({ timeout: 3000 }).catch(() => false)) {
+      await closePopover7.click();
+    }
+
     // ── Step 2: Click Add Step on the canvas ────────────────────────────────
     await page.getByTestId('add-step-button').click();
 
     // ── Step 3: Select 'Call AI Agent (Instant)' from the Add Step panel ────
-    // role='option' filtered by name — no data-testid on options (AddStepSearchView.tsx)
-    await page.getByRole('option', { name: /Call AI Agent.*Instant/i }).first().click();
+    // data-testid='builtin-tool-option' (AddStepSearchView.tsx line 434), filtered by text
+    await page.getByTestId('builtin-tool-option').filter({ hasText: /Call AI Agent/i }).first().click();
 
     // ── Step 4: Click the prompt textbox ────────────────────────────────────
     // Placeholder text from the plugin-rendered AI input field
