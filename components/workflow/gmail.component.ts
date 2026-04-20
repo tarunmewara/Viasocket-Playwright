@@ -45,13 +45,11 @@ export class GmailComponent {
 
     async fillTo(email: string): Promise<void> {
         await this.toInput.click();
-        await this.variablePopoverCloseButton.click().catch(() => {});
         await this.toInput.fill(email);
     }
 
     async fillSubject(subject: string): Promise<void> {
         await this.subjectInput.click();
-        await this.variablePopoverCloseButton.click().catch(() => {});
         await this.subjectInput.fill(subject);
     }
 
@@ -62,7 +60,6 @@ export class GmailComponent {
 
     async fillMessageBody(message: string): Promise<void> {
         await this.messageBodyInput.click();
-        await this.variablePopoverCloseButton.click().catch(() => {});
         await this.messageBodyInput.fill(message);
     }
 

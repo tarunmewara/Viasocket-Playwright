@@ -45,7 +45,7 @@ test.describe('Sales Generator Workflow - Modular Build Approach (POM)', () => {
         // Configure API Call
         await workflow.httpApi.apiEditorAccordionBtn.click();
         await workflow.httpApi.urlInput.fill('https://viasocket-test.free.beeceptor.com/orders');
-        await workflow.addStep.closeVariablePopover();
+        
         
         await workflow.httpApi.methodDropdown.click();
         await page.getByRole('option', { name: 'GET' }).click();
@@ -78,7 +78,7 @@ test.describe('Sales Generator Workflow - Modular Build Approach (POM)', () => {
         // Add JS Code step
         await workflow.addStep.clickAddStep();
         await workflow.addStep.selectStepByName('JS Code');
-        await workflow.addStep.closeVariablePopover();
+    
         
         const jsCode = `const response = context.res.API_Call;
 
@@ -121,7 +121,7 @@ return {
   rawData: sales
 };`;
         
-        await workflow.jscode.codeAccordionBtn.click();
+        await page.getByRole('button', { name: 'Code' }).click();
         await workflow.jscode.codeEditorTextbox.click();
         await workflow.jscode.codeEditorTextbox.fill(jsCode);
         
@@ -155,7 +155,7 @@ return {
         
         await workflow.multipath.fillCondition('if JS_Code.isEmpty is true');
         await page.waitForTimeout(1000);
-        await workflow.addStep.closeVariablePopover();
+
         await workflow.saveButton.click();
         
         // Add Gmail to "if true" path
@@ -165,10 +165,17 @@ return {
         await workflow.addStep.selectStepByText('Send Email With Attachments');
         
         await workflow.gmail.selectAuth(2);
-        await workflow.gmail.fillTo('shubhamdkdnetflix@gmail.com');
-        await workflow.gmail.fillSubject('there is no sales today');
+        
+        await page.getByRole('textbox', { name: 'E.g. recipient@example.com' }).click();
+        await page.keyboard.type('sc@viasocket.com ', { delay: 50 });
+        
+        await page.getByRole('textbox', { name: 'E.g. Subject of your email' }).click();
+        await page.keyboard.type('automation testing TC-SALES-01 ', { delay: 50 });
+        
         await workflow.gmail.selectMessageType('Plain');
-        await workflow.gmail.fillMessageBody('no sales');
+        
+        await page.getByRole('textbox', { name: 'E.g. Write your email message' }).click();
+        await page.keyboard.type('no sales', { delay: 50 });
         
         await workflow.gmail.dryRunTestButton.click();
         await expect(workflow.saveButton).toBeVisible();
@@ -195,7 +202,8 @@ return {
         await page.getByText('Add or drag step here').last().click();
         await workflow.addStep.selectStepByName('Call AI Agent (Instant)');
         
-        await workflow.aiAgent.fillQuery('give me one insight based on the sales report\n');
+        await page.getByRole('textbox', { name: 'E.g., What is AI?' }).click();
+        await page.keyboard.type('give me one insight based on the sales report\n', { delay: 50 });
         await workflow.aiAgent.dryRunTestButton.click();
         await expect(workflow.saveButton).toBeVisible();
         await workflow.saveButton.click();
@@ -220,8 +228,8 @@ return {
         // Add Google Sheets
         await workflow.addStep.clickAddStep();
         await workflow.addStep.searchStep('google sheet');
-        await page.getByText('Google Sheets', { exact: true }).click();
-        await workflow.addStep.selectStepByText('Add New Row To Sheet');
+        await page.getByTestId('add-step-slider').getByText('Google Sheets').click();
+        await workflow.addStep.selectStepByText('Add Row To Sheet');
         
         await workflow.googleSheets.selectAuth(2);
         await workflow.googleSheets.selectSpreadsheet(0);
@@ -238,20 +246,32 @@ return {
         
         await workflow.googleSheets.dryRunTestButton.click();
         
-        // Map column values
-        await workflow.googleSheets.mapColumnValue('Total_Orders--B', 'js_code', 'totalorders');
-        await workflow.googleSheets.mapColumnValue('Total_Sales--C', 'js_code', 'totalsales');
-        await workflow.googleSheets.mapColumnValue('Refund--D', 'js_code', 'refundedamount');
-        await workflow.googleSheets.mapColumnValue('net_Revenue--E', 'js_code', 'netrevenue');
+        // Map column values using new mapping pattern
+        await page.getByTestId('custom-autosuggest-column_name.Total_Orders').locator('path').nth(1).click({ force: true });
+        await page.getByRole('menuitem', { name: 'JS_Code {..}' }).hover();
+        await page.getByText('totalOrders').click();
         
-        // Map insights from AI Agent
-        await page.getByTestId('mentions-input-column_name.insights').click();
-        await page.getByTestId('tree-item-call_ai_agent_instantly').locator('svg').first().click();
-        await page.getByTestId('tree-item-content').getByTestId('tree-item-insert-button').click();
-        await workflow.addStep.closeVariablePopover();
+        await page.getByTestId('mentions-input-column_name.Total_Sales').click();
+        await page.getByTestId('custom-autosuggest-column_name.Total_Sales').locator('path').nth(4).click({ force: true });
+        await page.getByRole('menuitem', { name: 'JS_Code {..}' }).hover();
+        await page.getByText('totalSales').click();
         
-        await workflow.googleSheets.dryRunTestButton.click();
-        await workflow.googleSheets.inputVariablesCloseBtn.click();
+        await page.getByTestId('custom-autosuggest-column_name.Refund').locator('path').nth(1).click({ force: true });
+        await page.getByRole('menuitem', { name: 'JS_Code {..}' }).hover();
+        await page.getByText('refundedAmount').click();
+        
+        await page.getByTestId('mentions-input-column_name.net_Revenue').click();
+        await page.getByTestId('custom-autosuggest-column_name.net_Revenue').locator('path').nth(4).click({ force: true });
+        await page.getByRole('menuitem', { name: 'JS_Code {..}' }).hover();
+        await page.getByText('netRevenue').click();
+        
+        await page.getByTestId('custom-autosuggest-column_name.insights').locator('path').first().click({ force: true });
+        await page.getByText('Call_AI_Agent_Instantly').hover();
+        await page.getByText('content').click();
+        
+        await page.getByTestId('dry-run-test-button').click();
+        await page.getByRole('button', { name: 'Test' }).click();
+        await page.getByTestId('input-variables-close-btn').click();
         await expect(workflow.saveButton).toBeVisible();
         await workflow.saveButton.click();
         

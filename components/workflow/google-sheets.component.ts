@@ -79,7 +79,6 @@ export class GoogleSheetsComponent {
         const insertButton = this.page.getByTestId(`tree-item-${insertButtonName}`).getByTestId('tree-item-insert-button');
         await insertButton.waitFor({ state: 'visible' });
         await insertButton.click();
-        await this.variablePopoverCloseButton.click().catch(() => {});
     }
 
     async testAndSave(): Promise<void> {

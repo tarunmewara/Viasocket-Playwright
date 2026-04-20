@@ -116,15 +116,15 @@ export class MultipathComponent {
             });
         });
         await this.page.waitForTimeout(300);
-        // Phase 2: Playwright locator fallback (off-screen popovers may survive evaluate)
-        try {
-            const flowDocClose = this.page.locator('button').filter({ hasText: /Close/ }).filter({ hasText: /×/ });
-            if (await flowDocClose.count() > 0) {
-                await flowDocClose.first().click({ force: true, timeout: 2000 });
-            }
-        } catch {
-            // Already dismissed or not present
-        }
+        // Phase 2: Additional DOM-based fallback for Close buttons with × symbol
+        await this.page.evaluate(() => {
+            document.querySelectorAll('button').forEach((btn) => {
+                const text = (btn.textContent || '').trim();
+                if (text.includes('Close') && text.includes('×')) {
+                    (btn as HTMLElement).click();
+                }
+            });
+        });
         await this.page.waitForTimeout(200);
     }
 

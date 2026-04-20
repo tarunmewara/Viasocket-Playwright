@@ -46,6 +46,7 @@ export class AddStepComponent {
     }
 
     async closeVariablePopover(): Promise<void> {
-        await this.variablePopoverCloseButton.click().catch(() => {});
+        // Popover is now handled by dismissOverlays() in multipath component
+        await this.page.waitForTimeout(300);
     }
 }

@@ -28,7 +28,6 @@ export class AIAgentComponent {
 
     async fillQuery(query: string): Promise<void> {
         await this.queryInput.click();
-        await this.variablePopoverCloseButton.click().catch(() => {});
         await this.queryInput.fill(query);
     }
 
