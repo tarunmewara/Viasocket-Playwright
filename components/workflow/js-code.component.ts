@@ -81,6 +81,9 @@ export class JSCodeComponent {
     readonly muiBackdrop: Locator;              // MUI Backdrop — scoped to [role="presentation"]
     readonly addCancelText: Locator;            // getByText('AddCancel') — text stable for combined button label
     readonly duplicateVariableError: Locator;   // getByText('A variable with this name already exists.')
+    readonly AskAi: Locator;
+    readonly mentionsInput: Locator;            // data-testid='mentions-input' (AI description input)
+    readonly stepConfigContent: Locator;        // data-testid='step-config-content'
 
     // ── Code editor — empty textbox filter (TC-003 raw) ──────────────────────
     readonly codeEditorEmptyTextbox: Locator;   // #code-editor textbox with no content
@@ -144,7 +147,9 @@ export class JSCodeComponent {
         // Add-step flow
         this.addStepButton = page.getByTestId('add-step-button');
         this.jsCodeOption = page.getByRole('option', { name: 'JS Code', exact: true });
-        this.jsCodeOptionByLabel = page.getByLabel('JS CodeRun custom task, logic').getByText('JS Code');
+        this.jsCodeOptionByLabel = page.getByTestId('add-step-slider').getByText('JS Code');
+
+
         this.closeOverlayButton = page.getByTestId('slider-back-button');
 
         // Variable value inputs
@@ -156,6 +161,10 @@ export class JSCodeComponent {
 
         // Code editor empty textbox
         this.codeEditorEmptyTextbox = page.locator('#code-editor').getByRole('textbox').filter({ hasText: /^$/ });
+        this.AskAi = page.getByTestId('step-config-content').getByRole('button', { name: 'Ask AI' });
+        this.mentionsInput = page.getByTestId('mentions-input');
+        this.stepConfigContent = page.getByTestId('step-config-content');
+
     }
 
     // ── Actions menu ──────────────────────────────────────────────────────────
@@ -399,4 +408,25 @@ export class JSCodeComponent {
     async clickQueryInsertExpand(): Promise<void> {
         await this.queryInsertExpandButton.click();
     }
+
+    async fillMentionsInput(text: string): Promise<void> {
+        await this.mentionsInput.click();
+        await this.mentionsInput.fill(text);
+    }
+
+    async clickAskAiInStepConfig(): Promise<void> {
+        await this.AskAi.click();
+    }
+
+    async closeInputVariablesModal(): Promise<void> {
+        const isVisible = await this.inputVariablesCloseBtn.isVisible({ timeout: 2000 }).catch(() => false);
+        if (isVisible) {
+            await this.inputVariablesCloseBtn.click();
+        }
+    }
+
+    async clickAskAI() {
+        await this.AskAi.click()
+    }
+
 }

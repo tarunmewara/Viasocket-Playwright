@@ -11,6 +11,7 @@ import { ThreeDotsMenuComponent } from '../../components/workflow/three-dots-men
 import { AddStepComponent } from '../../components/workflow/add-step.component';
 import { GmailComponent } from '../../components/workflow/gmail.component';
 import { GoogleSheetsComponent } from '../../components/workflow/google-sheets.component';
+import { GoogleFormsComponent } from '../../components/workflow/google-forms.component';
 import { AIAgentComponent } from '../../components/workflow/ai-agent.component';
 
 /**
@@ -34,6 +35,7 @@ export class WorkflowPage {
     readonly addStep: AddStepComponent;
     readonly gmail: GmailComponent;
     readonly googleSheets: GoogleSheetsComponent;
+    readonly googleForms: GoogleFormsComponent;
     readonly aiAgent: AIAgentComponent;
 
     // Page-unique locators
@@ -41,7 +43,7 @@ export class WorkflowPage {
     readonly pauseActiveToggle: Locator;
 
     // Dry run / test
-    readonly dryRunTestButton: Locator;
+
     readonly dryRunTestFlowButton: Locator;
     readonly dryRunSkipDelayToggle: Locator;
     readonly dryRunExpandResponse: Locator;
@@ -128,6 +130,7 @@ export class WorkflowPage {
         this.addStep = new AddStepComponent(page);
         this.gmail = new GmailComponent(page);
         this.googleSheets = new GoogleSheetsComponent(page);
+        this.googleForms = new GoogleFormsComponent(page);
         this.aiAgent = new AIAgentComponent(page);
 
         // Page-unique locators
@@ -135,7 +138,7 @@ export class WorkflowPage {
         this.pauseActiveToggle = page.getByTestId('flow-pause-active-toggle');
 
         // Dry run / test
-        this.dryRunTestButton = page.getByTestId('dry-run-test-button');
+
         this.dryRunTestFlowButton = page.getByTestId('dry-run-test-flow-button');
         this.dryRunSkipDelayToggle = page.getByTestId('dry-run-skip-delay-toggle');
         this.dryRunExpandResponse = page.getByTestId('dry-run-expand-response');
@@ -298,4 +301,27 @@ export class WorkflowPage {
     async isTestVisible(): Promise<boolean> {
         return this.jscode.isTestVisible();
     }
+
+    // --- Canvas node interactions ---
+
+    async clickTriggerNode(): Promise<void> {
+        await this.inflowTriggerNode.click();
+    }
+
+    async clickStepNode(stepName: string): Promise<void> {
+        await this.page.getByTestId(`step-node-${stepName}`).locator('img').click();
+    }
+
+    async closeSlider(): Promise<void> {
+        await this.page.getByTestId('slider-close-button').click();
+    }
+
+    async testTrigger(): Promise<void> {
+        await this.page.getByTestId('trigger-dry-run-test-button').click();
+    }
+    async clickDryRunStepTestButton(): Promise<void> {
+        await this.dryRunStepTestButton.click();
+    }
+
+   
 }

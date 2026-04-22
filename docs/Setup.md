@@ -102,7 +102,7 @@ npx playwright open https://flow.viasocket.com --save-storage=playwright/.auth/u
 
 ```bash
 # Launch a persistent browser, log in manually, then Playwright saves state on close
-npx playwright open https://flow.viasocket.com --save-storage=playwright/.auth/user.json
+npx playwright open https://flow.viasocket.com/org --save-storage=playwright/.auth/user.json
 ```
 
 ### Setting Up the `.env` File

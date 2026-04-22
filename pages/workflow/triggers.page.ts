@@ -194,6 +194,14 @@ export class TriggersPage {
         await this.pluginTriggerBackButton.click();
     }
 
+    async selectTriggerApp(appName: string): Promise<void> {
+        await this.page.getByTestId('add-step-slider').getByText(appName).click();
+    }
+
+    async selectTriggerAction(actionName: string): Promise<void> {
+        await this.page.getByTestId('add-step-slider').getByText(actionName).click();
+    }
+
     async clickPreIfConditionButton(): Promise<void> {
         await this.cron.cronRunIfConditionButton.click();
     }
