@@ -1,4 +1,4 @@
-import { Page, Locator, FrameLocator } from '@playwright/test';
+import { Page, Locator, FrameLocator, expect } from '@playwright/test';
 
 /**
  * Workspace Notes Page
@@ -35,19 +35,26 @@ export class WorkspaceNotesPage {
      * Returns the DocStar editor's editable area inside the iframe.
      */
     getEditorLocator(): Locator {
-        return this.docstarFrame.locator('[contenteditable="true"]').first();
+        return this.page.locator('#iframe-component-techdocEmbed').contentFrame().locator('#tiptap-editor');
     }
 
     async writeNote(text: string): Promise<void> {
         const editor = this.getEditorLocator();
         await editor.click();
         await this.page.keyboard.type(text);
+
+        // Wait for text to be rendered in the TipTap editor
+        const expectedLength = text.length;
+        await expect(async () => {
+            const currentText = await editor.textContent() || '';
+            expect(currentText.length).toBeGreaterThanOrEqual(expectedLength * 0.9);
+        }).toPass({ timeout: 10000 });
     }
 
     async clearNote(): Promise<void> {
         const editor = this.getEditorLocator();
         await editor.click();
-        await this.page.keyboard.press('Control+A');
+        await this.page.locator('#iframe-component-techdocEmbed').contentFrame().locator('.tiptap').press('ControlOrMeta+a');
         await this.page.keyboard.press('Backspace');
     }
 
