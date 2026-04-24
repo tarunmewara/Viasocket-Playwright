@@ -135,7 +135,7 @@ Output in JSON:
 4. Return score, category, and reason.`;
 
     await workflow.jscode.fillMentionsInput(jsPrompt);
-    await page.keyboard.press('Tab');
+    await page.keyboard.press('Space');
     await workflow.jscode.clickAskAiInStepConfig();
     await workflow.jscode.clickTest();
     await page.getByRole('button', { name: 'Test' }).click();
@@ -144,7 +144,8 @@ Output in JSON:
   });
 
   test('TC-GF-005: Add if-condition to filter data', async ({ workflow, page }) => {
-    await page.goto('https://beta-flow.viasocket.com/projects/58109/proj58109/workflow/scri0068rvgq/draft');
+    await page.goto('https://beta-flow.viasocket.com/projects/58109/proj58109/workflow/scrivNKgATVf/draft');
+
     await workflow.clickTriggerNode();
     await workflow.testTrigger();
 
@@ -158,24 +159,97 @@ Output in JSON:
     await page.getByRole('button', { name: 'Test' }).click();
     await workflow.aiAgent.closeInputVariablesModal();
 
-
     await workflow.clickStepNode('extract_and_parse_ai_response');
-    await workflow.clickDryRunStepTestButton();
+    await workflow.jscode.clickTest();
     await page.getByRole('button', { name: 'Test' }).click();
     await workflow.jscode.closeInputVariablesModal();
-    await page.getByTestId('add-step-button').click();
-    await page.getByTestId('add-step-slider').getByText('Multiple Paths (If Conditions)').click();
-    await page.getByTestId('mentions-input').fill('category');
-    await page.getByTestId('mentions-input').press('ArrowDown');
-    await page.keyboard.press('Enter');
-    await page.getByTestId('mentions-input').fill('=="Cold"');
-    await page.getByTestId('save-button').click();
-    await page.getByTestId('switch-add-condition-button').click();
-    await page.getByTestId('mentions-input').fill('category');
-    await page.getByTestId('mentions-input').press('ArrowDown');
-    await page.keyboard.press('Enter');
-    await page.getByTestId('mentions-input').fill('=="Hot"');
-    await page.getByTestId('save-button').click();
 
+    await workflow.addStep.clickAddStep();
+    await workflow.addStep.selectStepByText('Multiple Paths (If Conditions)');
+    await workflow.multipath.fillCondition('Check if the AI response category is Cold');
+    await workflow.multipath.save();
+    await workflow.multipath.addmorecondition();
+    await workflow.multipath.fillCondition('Check if the AI response category is Hot');
+    await workflow.multipath.dismissOverlays();
+    await workflow.jscode.clickAskAiInStepConfig();
+  })
+  test('TC-GF-006: send message to slack', async ({ workflow, page }) => {
+    await page.goto(storedFlowPageUrl);
+
+    await workflow.clickTriggerNode();
+    await workflow.testTrigger();
+
+    await workflow.clickStepNode('normalize_lead_data');
+    await workflow.jscode.clickTest();
+    await page.getByRole('button', { name: 'Test' }).click();
+    await workflow.jscode.closeInputVariablesModal();
+
+    await workflow.clickStepNode('Call_AI_Agent_Instantly');
+    await workflow.aiAgent.clickTest();
+    await page.getByRole('button', { name: 'Test' }).click();
+    await workflow.aiAgent.closeInputVariablesModal();
+
+    await workflow.clickStepNode('extract_and_parse_ai_response');
+    await workflow.jscode.clickTest();
+    await page.getByRole('button', { name: 'Test' }).click();
+    await workflow.jscode.closeInputVariablesModal();
+
+
+    await page.locator('#Cold-inner-content').getByText('Add or drag step here').click();
+    await page.getByTestId('trigger-search-input').fill('slack');
+    await page.getByTestId('add-step-slider').getByText('Slack', { exact: true }).click();
+    await page.getByTestId('add-step-slider').getByText('Send Message').click();
+    await page.getByTestId('auth-connection-chip').click();
+    await page.getByTestId('auth-connection-item-auth2CKqZkbo_rowbu58rc').click();
+    await page.getByRole('button', { name: 'Select Slack channel(s)' }).click();
+    await page.getByText('all-test (C0ARQ0XRVAA)').click();
+    await page.locator('div').filter({ hasText: /^all-test$/ }).first().click();
+    await page.getByTestId('mentions-input-content').fill(`🔥 New Hot Lead
+
+Name: {{body."Full_name"}}
+Company: {{body."Company"}}
+Score: {{body."Budget"}}
+
+Requirement:
+{{body."Requirement"}}`);
+    await page.getByTestId('dry-run-test-button').click();
+    await page.getByTestId('save-button').click();
+  })
+  test('TC-GF-007: send email for hot leads', async ({ workflow, page }) => {
+    await page.goto(storedFlowPageUrl);  
+    await workflow.clickTriggerNode();
+    await workflow.testTrigger();
+
+    await workflow.clickStepNode('normalize_lead_data');
+    await workflow.jscode.clickTest();
+    await page.getByRole('button', { name: 'Test' }).click();
+    await workflow.jscode.closeInputVariablesModal();
+
+    await workflow.clickStepNode('Call_AI_Agent_Instantly');
+    await workflow.aiAgent.clickTest();
+    await page.getByRole('button', { name: 'Test' }).click();
+    await workflow.aiAgent.closeInputVariablesModal();
+
+    await workflow.clickStepNode('extract_and_parse_ai_response');
+    await workflow.jscode.clickTest();
+    await page.getByRole('button', { name: 'Test' }).click();
+    await workflow.jscode.closeInputVariablesModal();
+ 
+
+    await page.locator('#Hot-inner-content').getByText('Add or drag step here').click();
+  await page.getByTestId('trigger-search-input').fill('gmail');
+  await page.getByTestId('add-step-slider').getByText('Gmail', { exact: true }).click();
+  await page.getByTestId('add-step-slider').getByText('Send Email With Attachments').click();
+  await page.getByTestId('mentions-input-to').click();
+  await page.getByTestId('mentions-input-to').fill('sc@Viasocket.com');
+  await page.getByTestId('mentions-input-subject').click();
+  await page.getByTestId('mentions-input-to').fill('sc@Viasocket.com ');
+  await page.getByTestId('mentions-input-subject').fill('automatoin testing workflow');
+  await page.getByTestId('dropdown-chip-messageType').click();
+  await page.getByRole('option', { name: 'Plain' }).click();
+  await page.getByTestId('mentions-input-messageBody').click();
+  await page.getByTestId('mentions-input-messageBody').fill('hii suraj choudhary,\nautomation testing workflow is runnig till this step,and this is if condition hot lead block');
+  await page.getByTestId('dry-run-test-button').click();
+  await page.getByTestId('save-button').click();
   })
 });

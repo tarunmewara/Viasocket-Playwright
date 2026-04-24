@@ -105,8 +105,7 @@ test.describe('Workspace Selection - Pagination Tests (requires 25+ workspaces)'
 
     test.beforeEach(async ({ workspace, page }) => {
         await workspace.navigateToOrg();
-        // Wait for workspace selection page to be fully loaded
-        await workspace.createNewWorkspaceButton.waitFor({ state: 'visible', timeout: 60000 });
+       
     });
 
     test('TC-WORK-SEL-09: Verify pagination controls are visible', async ({ page }) => {

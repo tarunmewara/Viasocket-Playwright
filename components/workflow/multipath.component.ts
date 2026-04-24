@@ -40,6 +40,7 @@ export class MultipathComponent {
 
     // ── Panel heading ──────────────────────────────────────────────────────
     readonly panelHeading: Locator;           // heading "MultiPath"
+    readonly moreConditionsButton: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -54,6 +55,7 @@ export class MultipathComponent {
         this.addConditionButton = page.getByTestId('ifblock-add-condition-button');
         this.saveButton = page.getByTestId('save-button');
         this.stepChangeButton = page.getByTestId('step-change-button');
+        this.moreConditionsButton = page.getByTestId('switch-add-condition-button');
 
         // Condition input — placeholder selector (MentionsInput renders textarea)
         this.conditionInput = page.getByPlaceholder('Enter a condition for path.');
@@ -258,6 +260,10 @@ export class MultipathComponent {
             const btn = document.querySelector('[data-testid="ifblock-add-condition-button"]') as HTMLElement;
             if (btn) btn.click();
         });
+    }
+    async addmorecondition() {
+        await this.moreConditionsButton.waitFor({ state: 'visible', timeout: 5000 });
+        await this.moreConditionsButton.click();
     }
 
     /**
