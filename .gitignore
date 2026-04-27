@@ -10,3 +10,4 @@ node_modules/
 # Environment variables (contains auth state path — do not commit)
 .env
 .env.local
+/playwright/.auth/user.json
