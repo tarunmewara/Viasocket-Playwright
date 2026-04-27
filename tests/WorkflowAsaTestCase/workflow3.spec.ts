@@ -22,49 +22,27 @@ test.describe('Google Forms Trigger Workflow', () => {
     await expect(workflow.publish.goLiveButton).toBeVisible();
   });
 
-  test('TC-GF-002: Add JS Code step to existing workflow', async ({ page, workflow, triggers }) => {
+  test('TC-GF-002: Add JS Code step to existing workflow', async ({ page, workflow }) => {
     await page.goto(storedFlowPageUrl);
-    // await workflow.addStep.addStepButton.waitFor({ state: 'visible', timeout: 15000 });
     await workflow.clickTriggerNode();
     await workflow.testTrigger();
 
     await workflow.addStep.clickAddStep();
+    await workflow.googleForms.selectJsCode();
 
-    await workflow.googleForms.selectJsCode()
-    await page.getByRole('textbox', { name: 'Function Name' }).fill('normalize_lead_data');
-
-
-
-    const code = `const lead = input;
-
-// Validation
-if (!lead.email || !lead.name) {
-  throw new Error("Missing required fields");
-}
-
-// Normalize budget
-let budget = parseInt(lead.budget) || 0;
-
-// Normalize text
-const normalizedLead = {
-  name: lead.name.trim(),
-  email: lead.email.toLowerCase(),
-  company: lead.company || "Unknown",
-  budget: budget,
-  requirement: lead.requirement || "",
-  createdAt: new Date().toISOString()
-};
-
-return {
-  normalizedLead
-};`;
+    const code = `1. Define lead object with provided variables.
+2. Validate email and name.
+3. Normalize lead data.
+4. Calculate budget score.
+5. Return normalized lead and budget score.`;
     await workflow.googleForms.clickMentionsInput();
     await workflow.googleForms.mentionsInput.fill(code);
     await page.keyboard.press('Space');
     await workflow.jscode.clickAskAI();
     await workflow.jscode.chatbotChangesAppliedLink.waitFor({ state: 'visible', timeout: 60000 });
+    await workflow.jscode.fillFunctionName('normalize_lead_data');
     await workflow.jscode.clickTest();
-    await page.getByRole('button', { name: 'Test' }).click();
+    await workflow.jscode.clickTestButtonInModal();
     await workflow.googleForms.closeInputVariablesModal();
     await workflow.jscode.save();
 
@@ -79,7 +57,7 @@ return {
     await workflow.closeSlider();
     await workflow.clickStepNode('normalize_lead_data');
     await workflow.clickDryRunStepTestButton();
-    await page.getByRole('button', { name: 'Test' }).click();
+    await workflow.jscode.clickTestButtonInModal();
     await workflow.aiAgent.closeInputVariablesModal();
     await workflow.closeSlider();
     await workflow.addStep.clickAddStep();
@@ -101,29 +79,32 @@ Output in JSON:
 
     await workflow.aiAgent.queryInput.click();
     await workflow.aiAgent.queryInput.fill(aiPrompt);
-    await page.getByTestId('add-variable-button').click();
-    await page.getByText('normalize_lead_data').click();
+    await workflow.aiAgent.clickAddVariableButton();
+    await workflow.aiAgent.selectVariableByText('normalize_lead_data');
     await workflow.aiAgent.clickTest();
-    await page.getByRole('button', { name: 'Test' }).click();
+    await workflow.aiAgent.clickTestButtonInModal();
     await workflow.aiAgent.closeInputVariablesModal();
 
     await workflow.aiAgent.save();
     await page.waitForTimeout(3000);
   });
+
+
   test('TC-GF-004: Add JS-step to formate ai agent data', async ({ page, workflow }) => {
     await page.goto(storedFlowPageUrl);
 
     await workflow.clickTriggerNode();
     await workflow.testTrigger();
+    await page.waitForTimeout(5000);
 
     await workflow.clickStepNode('normalize_lead_data');
     await workflow.jscode.clickTest();
-    await page.getByRole('button', { name: 'Test' }).click();
+    await workflow.jscode.clickTestButtonInModal();
     await workflow.jscode.closeInputVariablesModal();
 
     await workflow.clickStepNode('Call_AI_Agent_Instantly');
     await workflow.aiAgent.clickTest();
-    await page.getByRole('button', { name: 'Test' }).click();
+    await workflow.aiAgent.clickTestButtonInModal();
     await workflow.aiAgent.closeInputVariablesModal();
 
     await workflow.addStep.clickAddStep();
@@ -138,16 +119,17 @@ Output in JSON:
     await page.keyboard.press('Space');
     await workflow.jscode.clickAskAiInStepConfig();
     await workflow.jscode.clickTest();
-    await page.getByRole('button', { name: 'Test' }).click();
+    await workflow.jscode.clickTestButtonInModal();
     await workflow.jscode.closeInputVariablesModal();
     await workflow.jscode.save();
   });
 
   test('TC-GF-005: Add if-condition to filter data', async ({ workflow, page }) => {
-    await page.goto('https://beta-flow.viasocket.com/projects/58109/proj58109/workflow/scrivNKgATVf/draft');
+    await page.goto(storedFlowPageUrl);
 
     await workflow.clickTriggerNode();
     await workflow.testTrigger();
+    await page.waitForTimeout(5000);
 
     await workflow.clickStepNode('normalize_lead_data');
     await workflow.jscode.clickTest();
@@ -165,91 +147,158 @@ Output in JSON:
     await workflow.jscode.closeInputVariablesModal();
 
     await workflow.addStep.clickAddStep();
+    await page.waitForTimeout(1000);
     await workflow.addStep.selectStepByText('Multiple Paths (If Conditions)');
-    await workflow.multipath.fillCondition('Check if the AI response category is Cold');
+    // await workflow.multipath.fillCondition('Check if the AI response category is Cold');
+    await page.getByTestId('mentions-input').click();
+    await page.keyboard.type('Check if the AI response category is Cold');
     await workflow.multipath.save();
+
     await workflow.multipath.addmorecondition();
-    await workflow.multipath.fillCondition('Check if the AI response category is Hot');
-    await workflow.multipath.dismissOverlays();
+    await page.keyboard.type('Check if the AI response category is Hot');
+
     await workflow.jscode.clickAskAiInStepConfig();
+    await page.waitForTimeout(5000);
   })
+
   test('TC-GF-006: send message to slack', async ({ workflow, page }) => {
     await page.goto(storedFlowPageUrl);
 
     await workflow.clickTriggerNode();
     await workflow.testTrigger();
+    await page.waitForTimeout(5000);
 
     await workflow.clickStepNode('normalize_lead_data');
     await workflow.jscode.clickTest();
-    await page.getByRole('button', { name: 'Test' }).click();
+    await workflow.jscode.clickTestButtonInModal();
     await workflow.jscode.closeInputVariablesModal();
 
     await workflow.clickStepNode('Call_AI_Agent_Instantly');
     await workflow.aiAgent.clickTest();
-    await page.getByRole('button', { name: 'Test' }).click();
+    await workflow.aiAgent.clickTestButtonInModal();
     await workflow.aiAgent.closeInputVariablesModal();
 
     await workflow.clickStepNode('extract_and_parse_ai_response');
     await workflow.jscode.clickTest();
-    await page.getByRole('button', { name: 'Test' }).click();
+    await workflow.jscode.clickTestButtonInModal();
     await workflow.jscode.closeInputVariablesModal();
 
-
-    await page.locator('#Cold-inner-content').getByText('Add or drag step here').click();
-    await page.getByTestId('trigger-search-input').fill('slack');
-    await page.getByTestId('add-step-slider').getByText('Slack', { exact: true }).click();
-    await page.getByTestId('add-step-slider').getByText('Send Message').click();
-    await page.getByTestId('auth-connection-chip').click();
-    await page.getByTestId('auth-connection-item-auth2CKqZkbo_rowbu58rc').click();
-    await page.getByRole('button', { name: 'Select Slack channel(s)' }).click();
-    await page.getByText('all-test (C0ARQ0XRVAA)').click();
+    await workflow.multipath.clickAddStepInPath('Cold');
+    await workflow.addStep.searchStep('slack');
+    await workflow.addStep.selectStepByText('Slack');
+    await workflow.addStep.selectStepByText('Send Message');
+    await workflow.slack.selectAuthConnection('auth2CKqZkbo_rowbu58rc');
+    await workflow.slack.selectChannel('all-test (C0ARQ0XRVAA)');
     await page.locator('div').filter({ hasText: /^all-test$/ }).first().click();
-    await page.getByTestId('mentions-input-content').fill(`🔥 New Hot Lead
 
-Name: {{body."Full_name"}}
-Company: {{body."Company"}}
-Score: {{body."Budget"}}
-
-Requirement:
-{{body."Requirement"}}`);
-    await page.getByTestId('dry-run-test-button').click();
-    await page.getByTestId('save-button').click();
+    await workflow.slack.clickAddVariableButton();
+    await workflow.slack.selectVariableByText('extract_and_parse_ai_response');
+    await workflow.slack.clickTest();
+    await workflow.slack.clickTestButtonInModal();
+    await workflow.slack.closeInputVariablesModal();
+    await workflow.slack.save();
   })
+
   test('TC-GF-007: send email for hot leads', async ({ workflow, page }) => {
-    await page.goto(storedFlowPageUrl);  
+    await page.goto(storedFlowPageUrl);
     await workflow.clickTriggerNode();
     await workflow.testTrigger();
+    await page.waitForTimeout(5000);
 
     await workflow.clickStepNode('normalize_lead_data');
     await workflow.jscode.clickTest();
-    await page.getByRole('button', { name: 'Test' }).click();
+    await workflow.jscode.clickTestButtonInModal();
     await workflow.jscode.closeInputVariablesModal();
 
     await workflow.clickStepNode('Call_AI_Agent_Instantly');
     await workflow.aiAgent.clickTest();
-    await page.getByRole('button', { name: 'Test' }).click();
+    await workflow.aiAgent.clickTestButtonInModal();
     await workflow.aiAgent.closeInputVariablesModal();
 
     await workflow.clickStepNode('extract_and_parse_ai_response');
     await workflow.jscode.clickTest();
-    await page.getByRole('button', { name: 'Test' }).click();
+    await workflow.jscode.clickTestButtonInModal();
     await workflow.jscode.closeInputVariablesModal();
- 
 
-    await page.locator('#Hot-inner-content').getByText('Add or drag step here').click();
-  await page.getByTestId('trigger-search-input').fill('gmail');
-  await page.getByTestId('add-step-slider').getByText('Gmail', { exact: true }).click();
-  await page.getByTestId('add-step-slider').getByText('Send Email With Attachments').click();
-  await page.getByTestId('mentions-input-to').click();
-  await page.getByTestId('mentions-input-to').fill('sc@Viasocket.com');
-  await page.getByTestId('mentions-input-subject').click();
-  await page.getByTestId('mentions-input-to').fill('sc@Viasocket.com ');
-  await page.getByTestId('mentions-input-subject').fill('automatoin testing workflow');
-  await page.getByTestId('dropdown-chip-messageType').click();
-  await page.getByRole('option', { name: 'Plain' }).click();
-  await page.getByTestId('mentions-input-messageBody').click();
-  await page.getByTestId('mentions-input-messageBody').fill('hii suraj choudhary,\nautomation testing workflow is runnig till this step,and this is if condition hot lead block');
-  await page.getByTestId('dry-run-test-button').click();
-  await page.getByTestId('save-button').click();
+    await workflow.multipath.clickAddStepInPath('Hot');
+    await workflow.addStep.searchStep('gmail');
+    await workflow.addStep.selectStepByText('Gmail');
+    await workflow.addStep.selectStepByText('Send Email With Attachments');
+    await page.getByTestId('auth-connection-chip').click();
+    await page.getByTestId('auth-connection-item-auth27YL3YAZ_rowo0bqrhj5g').click();
+    await workflow.gmail.fillToMentionsInput('sc@Viasocket.com');
+    await page.keyboard.press('Space');
+    await workflow.gmail.fillSubjectMentionsInput('automatoin testing workflow');
+    await page.keyboard.press('Space');
+    await workflow.gmail.fillMessageBodyMentionsInput('hii suraj choudhary,\nautomation testing workflow is runnig till this step,and this is if condition hot lead block');
+    await workflow.gmail.clickTest();
+    await workflow.gmail.save();
   })
+
+  test('TC-GF-008: workspace memory', async ({ workflow, page }) => {
+    await page.goto(storedFlowPageUrl);
+    await workflow.clickTriggerNode();
+    await workflow.testTrigger();
+    await page.waitForTimeout(5000);
+
+    await workflow.clickStepNode('normalize_lead_data');
+    await workflow.jscode.clickTest();
+    await workflow.jscode.clickTestButtonInModal();
+    await workflow.jscode.closeInputVariablesModal();
+
+    await workflow.clickStepNode('Call_AI_Agent_Instantly');
+    await workflow.aiAgent.clickTest();
+    await workflow.aiAgent.clickTestButtonInModal();
+    await workflow.aiAgent.closeInputVariablesModal();
+
+    await workflow.clickStepNode('extract_and_parse_ai_response');
+    await workflow.jscode.clickTest();
+    await workflow.jscode.clickTestButtonInModal();
+    await workflow.jscode.closeInputVariablesModal();
+
+
+    await workflow.addStep.clickAddStep();
+    await workflow.addStep.searchStep('workspace memory');
+    await workflow.addStep.selectStepByText('Workspace Memory');
+    await workflow.workspaceMemory.selectAuthConnection('auth2XzbNsrW_rowhc2623dta');
+    await workflow.workspaceMemory.fillUniqueId('abc123');
+    await page.keyboard.press('Space');
+
+    const workspaceCode = `
+   async function saveLeadData() {
+  const key = "leadData";
+
+  const leadRecord = {
+    email: context.req?.body?.Email,
+    name: context.req?.body?.Full_name,
+    company: context.req?.body?.Company,
+    budget: context.req?.body?.Budget,
+    score: context.res.normalize_and_score_lead?.budgetScore,
+    category: context.res.parse_and_return_ai_response?.category
+  };
+  let existingData = await findFromMemory(key, []);
+
+  if (!Array.isArray(existingData)) {
+    existingData = [];
+  }
+
+  existingData.push(leadRecord);
+
+  await updateInMemory(key, existingData);
+
+  return leadRecord;
+}
+
+return await saveLeadData();
+`;
+    await workflow.workspaceMemory.fillAiCode(workspaceCode);
+    await page.keyboard.press('Space');
+    await workflow.workspaceMemory.clickAskAi();
+    await page.waitForTimeout(5000);
+    await workflow.workspaceMemory.clickTest();
+    await workflow.workspaceMemory.clickTestButtonInModal();
+    await workflow.workspaceMemory.closeInputVariablesModal();
+    await workflow.workspaceMemory.save();
+  })
+
 });

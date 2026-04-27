@@ -13,6 +13,8 @@ import { GmailComponent } from '../../components/workflow/gmail.component';
 import { GoogleSheetsComponent } from '../../components/workflow/google-sheets.component';
 import { GoogleFormsComponent } from '../../components/workflow/google-forms.component';
 import { AIAgentComponent } from '../../components/workflow/ai-agent.component';
+import { SlackComponent } from '../../components/workflow/slack.component';
+import { WorkspaceMemoryComponent } from '../../components/workflow/workspace-memory.component';
 
 /**
  * Workflow Page
@@ -37,6 +39,8 @@ export class WorkflowPage {
     readonly googleSheets: GoogleSheetsComponent;
     readonly googleForms: GoogleFormsComponent;
     readonly aiAgent: AIAgentComponent;
+    readonly slack: SlackComponent;
+    readonly workspaceMemory: WorkspaceMemoryComponent;
 
     // Page-unique locators
     readonly flowTitleInput: Locator;
@@ -132,6 +136,8 @@ export class WorkflowPage {
         this.googleSheets = new GoogleSheetsComponent(page);
         this.googleForms = new GoogleFormsComponent(page);
         this.aiAgent = new AIAgentComponent(page);
+        this.slack = new SlackComponent(page);
+        this.workspaceMemory = new WorkspaceMemoryComponent(page);
 
         // Page-unique locators
         this.flowTitleInput = page.locator('#flow-title-textfield');
@@ -319,9 +325,10 @@ export class WorkflowPage {
     async testTrigger(): Promise<void> {
         await this.page.getByTestId('trigger-dry-run-test-button').click();
     }
+
     async clickDryRunStepTestButton(): Promise<void> {
         await this.dryRunStepTestButton.click();
     }
 
-   
+
 }

@@ -84,6 +84,8 @@ export class JSCodeComponent {
     readonly AskAi: Locator;
     readonly mentionsInput: Locator;            // data-testid='mentions-input' (AI description input)
     readonly stepConfigContent: Locator;        // data-testid='step-config-content'
+    readonly functionNameInput: Locator;        // Function Name textbox
+    readonly testButtonInModal: Locator;        // Test button inside input variables modal
 
     // ── Code editor — empty textbox filter (TC-003 raw) ──────────────────────
     readonly codeEditorEmptyTextbox: Locator;   // #code-editor textbox with no content
@@ -164,6 +166,8 @@ export class JSCodeComponent {
         this.AskAi = page.getByTestId('step-config-content').getByRole('button', { name: 'Ask AI' });
         this.mentionsInput = page.getByTestId('mentions-input');
         this.stepConfigContent = page.getByTestId('step-config-content');
+        this.functionNameInput = page.getByRole('textbox', { name: 'Function Name' });
+        this.testButtonInModal = page.getByRole('button', { name: 'Test' });
 
     }
 
@@ -427,6 +431,15 @@ export class JSCodeComponent {
 
     async clickAskAI() {
         await this.AskAi.click()
+    }
+
+    async fillFunctionName(name: string): Promise<void> {
+        await this.functionNameInput.click();
+        await this.functionNameInput.fill(name);
+    }
+
+    async clickTestButtonInModal(): Promise<void> {
+        await this.testButtonInModal.click();
     }
 
 }

@@ -55,7 +55,7 @@ export default defineConfig({
 
         // Slow down operations to avoid rate limit errors (1015)
         launchOptions: {
-            slowMo: 2000
+            slowMo: 1000
         }
     },
 

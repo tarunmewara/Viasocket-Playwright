@@ -31,6 +31,7 @@ export class MultipathComponent {
 
     // ── Condition input (CustomAutoSuggestV2 → MentionsInput → textarea) ──
     readonly conditionInput: Locator;         // placeholder='Enter a condition for path.'
+    readonly mentionsInput: Locator;          // data-testid='mentions-input'
 
     // ── Else block ─────────────────────────────────────────────────────────
     readonly elseDescription: Locator;        // text content from AccordionDetails
@@ -59,6 +60,7 @@ export class MultipathComponent {
 
         // Condition input — placeholder selector (MentionsInput renders textarea)
         this.conditionInput = page.getByPlaceholder('Enter a condition for path.');
+        this.mentionsInput = page.getByTestId('mentions-input');
 
         // Else description — text content
         this.elseDescription = page.getByText(
@@ -264,6 +266,15 @@ export class MultipathComponent {
     async addmorecondition() {
         await this.moreConditionsButton.waitFor({ state: 'visible', timeout: 5000 });
         await this.moreConditionsButton.click();
+    }
+
+    async fillConditionInput(text: string): Promise<void> {
+        await this.mentionsInput.click();
+        await this.page.keyboard.type(text);
+    }
+
+    async clickAddStepInPath(pathId: string): Promise<void> {
+        await this.page.locator(`#${pathId}-inner-content`).getByText('Add or drag step here').click();
     }
 
     /**
